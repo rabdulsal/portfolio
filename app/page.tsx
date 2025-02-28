@@ -45,7 +45,7 @@ export default function Home() {
             Hi, I'm <span className="text-primary">Rashad</span>
           </h1>
           <p className="text-xl sm:text-2xl text-muted-foreground">
-            AI & Automation Engineer | iOS Developer
+            AI Engineer | App Developer
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild>
@@ -119,7 +119,7 @@ export default function Home() {
         >
           <h2 className="text-3xl font-bold mb-8">About Me</h2>
           <p className="text-lg text-muted-foreground mb-6">
-            I've been building innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation / engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's work together to build the future! 🚀 💫 
+            I've been building innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation & engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's work together to build the future! 🚀 💫 
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>
