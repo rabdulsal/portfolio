@@ -116,7 +116,7 @@ export default function Home() {
               </div>
               <div className="flex justify-center">
                 <Button variant="outline" size="lg" asChild>
-                  <a href="https://github.com/rabdulsal/Hot-Not-Bot-Backend" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/stars/rabdulsal/lists/facerater-ai-codebases" target="_blank" rel="noopener noreferrer">
                     <Github className="mr-2 h-5 w-5" />
                     View Code
                   </a>
