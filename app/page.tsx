@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Github, Linkedin, Mail, Terminal } from "lucide-react";
@@ -21,7 +20,6 @@ export default function Home() {
           <div className="flex justify-between h-16 items-center">
             <Terminal className="h-8 w-8" />
             <div className="flex items-center gap-4">
-              <ThemeToggle />
               <Button variant="ghost" asChild>
                 <a href="#contact">Contact</a>
               </Button>
@@ -30,28 +28,52 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section with Deep Purple Gradient and Grid Effect */}
       <section
         ref={heroRef}
-        className="min-h-screen flex items-center justify-center pt-16"
+        className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden"
+        style={{
+          background: "linear-gradient(to bottom, #1a0b2e, #121212)",
+        }}
       >
+        {/* Grid Pattern Overlay */}
+        <div 
+          className="absolute inset-0 z-0 opacity-20"
+          style={{
+            backgroundImage: "linear-gradient(#8a2be2 1px, transparent 1px), linear-gradient(90deg, #8a2be2 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+            backgroundPosition: "center center",
+          }}
+        />
+        
+        {/* Abstract Glow Effects */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-600/20 blur-[100px] z-0"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-indigo-500/20 blur-[120px] z-0"></div>
+        <div className="absolute top-1/2 right-1/3 w-72 h-72 rounded-full bg-blue-500/10 blur-[80px] z-0"></div>
+        
+        {/* Gradient Fade to Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10"></div>
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={heroInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center space-y-6 px-4"
+          className="text-center space-y-6 px-4 z-20"
         >
           <h1 className="text-4xl sm:text-6xl font-bold">
-            Hi, I'm <span className="text-primary">Rashad</span>
+            Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
           </h1>
           <p className="text-xl sm:text-2xl text-muted-foreground">
             AI Engineer | App Developer
           </p>
           <div className="flex justify-center gap-4">
-            <Button asChild>
+            <Button 
+              asChild
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0"
+            >
               <a href="#projects">View Projects</a>
             </Button>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20">
               <a href="#contact">Get in Touch</a>
             </Button>
           </div>
@@ -119,7 +141,7 @@ export default function Home() {
         >
           <h2 className="text-3xl font-bold mb-8">About Me</h2>
           <p className="text-lg text-muted-foreground mb-6">
-            I've been building innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation & engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's work together to build the future! 🚀 💫 
+            I've been developing innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation / engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's work together to build the future! 🚀 💫 
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>
