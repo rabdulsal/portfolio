@@ -16,8 +16,8 @@ export default function Home() {
 
   useEffect(() => {
     // Start the assistant when component mounts
-    const assistantId = process.env.NEXT_PUBLIC_VITE_ASSISTANT_ID || "9a480022-06e4-4ae2-b9bd-6d18b0cbb504";
-    startAssistant(assistantId);
+    
+    startAssistant();
     
     // Clean up by stopping the assistant when component unmounts
     return () => {

@@ -7,7 +7,7 @@ console.log(assistantId);
 
 let activeAssistant = null;
 
-export const startAssistant = async (assistantId) => {
+export const startAssistant = async () => {
   if (activeAssistant) {
     return activeAssistant; // Return existing instance if already started
   }
