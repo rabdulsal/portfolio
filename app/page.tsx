@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Github, Linkedin, Mail, Terminal } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { startAssistant, stopAssistant } from "@/components/ai";
+import { vapi } from "@/components/ai";
+import ContactForm from "@/components/custom/contact-form";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -14,17 +16,45 @@ export default function Home() {
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true });
   const [contactRef, contactInView] = useInView({ triggerOnce: true });
 
+  // VAPI Configs
+  const [callStarted, setCallStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [assistantIsSpeaking, setAssistantIsSpeaking] = useState(false);
+  const [volumeLevel, setVolumeLevel] = useState(0);
+  const [callId, setCallId] = useState("");
+  const [callResult, setCallResult] = useState(null);
+  const [loadingResult, setLoadingResult] = useState(false);
+  
+
   useEffect(() => {
-    // Start the assistant when component mounts
-    
-    startAssistant();
-    
-    // Clean up by stopping the assistant when component unmounts
-    return () => {
-      stopAssistant();
-    };
+    vapi.on("call-start", () => {
+      setCallStarted(true);
+      setLoading(true);
+    }).on("call-end", () => {
+      setCallStarted(false);
+      setLoading(false);
+    }).on("speech-start", () => {
+      setAssistantIsSpeaking(true);
+    }).on("speech-end", () => {
+      setAssistantIsSpeaking(false);
+    }).on("speech-end", () => {
+      setAssistantIsSpeaking(false);
+    }).on("volume-level", (volume) => {
+      setVolumeLevel(volume);
+    })
   }, []);
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // console.log(firstName, lastName, email, phone);
+  };
+
+  const handleStart = () => {
+    vapi.start();
+  };
+
+  
+    
   return (
     <main className="min-h-screen bg-background">
       {/* Navigation */}
@@ -204,6 +234,8 @@ export default function Home() {
               </a>
             </Button>
           </div>
+          {/* Contact Form */}
+          {/* <ContactForm handleSubmit={handleSubmit} handleStart={handleStart} callStarted={callStarted} /> */}
         </motion.div>
       </section>
 
