@@ -1,16 +1,29 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Github, Linkedin, Mail, Terminal } from "lucide-react";
 import { useInView } from "react-intersection-observer";
+import { startAssistant, stopAssistant } from "@/components/ai";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
   const [projectsRef, projectsInView] = useInView({ triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true });
   const [contactRef, contactInView] = useInView({ triggerOnce: true });
+
+  useEffect(() => {
+    // Start the assistant when component mounts
+    const assistantId = process.env.NEXT_PUBLIC_VITE_ASSISTANT_ID || "9a480022-06e4-4ae2-b9bd-6d18b0cbb504";
+    startAssistant(assistantId);
+    
+    // Clean up by stopping the assistant when component unmounts
+    return () => {
+      stopAssistant();
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-background">
