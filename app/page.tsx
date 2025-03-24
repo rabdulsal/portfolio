@@ -8,7 +8,6 @@ import { Github, Linkedin, Mail, Terminal, Phone } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { startAssistant, stopAssistant } from "@/components/ai";
 import { vapi } from "@/components/ai";
-import ContactForm from "@/components/custom/ContactForm";
 import ActiveCallDetails from "@/components/custom/ActiveCallDetails";
 
 export default function Home() {
