@@ -79,4 +79,138 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Call CSS */
+  .active-call-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(44, 44, 44, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+  }
+  
+  .assistant-speech-editor {
+    margin-top: 15px;
+  }
+
+  .assistant-speech-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(44, 44, 44, 0.8);
+    border-radius: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+  }
+
+  .end-call-button {
+    margin-top: 20px;
+  }
+  
+  .end-call-button button {
+    padding: 10px 20px;
+    background-color: #ff5722;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .end-call-button button:hover {
+    background-color: #e64a19;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+  }
+  
+  .loading:before {
+    content: "";
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #8a2be2;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .speech-indicator {
+    width: 25px;
+    height: 25px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background-color: #f03e3e;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .speaking {
+    background-color: #3ef07c;
+    transform: scale(1.2);
+  }
+  
+  .speech-status {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .volume-level {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(44, 44, 44, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .volume-label {
+    color: #ffffff;
+    margin-bottom: 8px;
+  }
+  
+  .volume-bars {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .volume-bar {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    background-color: #555;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .volume-bar.active {
+    background-color: #8a2be2;
+  }
+  
+  .volume-value {
+    color: #ffffff;
+  }
 }

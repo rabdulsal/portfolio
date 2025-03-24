@@ -2,11 +2,8 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 
-export default function ContactForm( {handleSubmit, handleStart, callStarted} ) {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
+export default function ContactForm( {handleSubmit, handleStart, callStarted, firstName, lastName, email, phone} ) {
+    
     const allFieldsFilled = firstName && lastName && email && phone;
     return (
         <form onSubmit={handleSubmit} className="space-y-4">

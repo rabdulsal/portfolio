@@ -4,18 +4,25 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Github, Linkedin, Mail, Terminal } from "lucide-react";
+import { Github, Linkedin, Mail, Terminal, Phone } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { startAssistant, stopAssistant } from "@/components/ai";
 import { vapi } from "@/components/ai";
 import ContactForm from "@/components/custom/contact-form";
+import ActiveCallDetails from "@/components/custom/ActiveCallDetails";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
   const [projectsRef, projectsInView] = useInView({ triggerOnce: true });
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true });
   const [contactRef, contactInView] = useInView({ triggerOnce: true });
-
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  /* Refactor to ContactForm Component */
+  const allFieldsFilled = firstName && lastName && email && phone;
+  
   // VAPI Configs
   const [callStarted, setCallStarted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,12 +31,13 @@ export default function Home() {
   const [callId, setCallId] = useState("");
   const [callResult, setCallResult] = useState(null);
   const [loadingResult, setLoadingResult] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
   
 
   useEffect(() => {
     vapi.on("call-start", () => {
       setCallStarted(true);
-      setLoading(true);
+      setLoading(false);
     }).on("call-end", () => {
       setCallStarted(false);
       setLoading(false);
@@ -49,11 +57,16 @@ export default function Home() {
     // console.log(firstName, lastName, email, phone);
   };
 
-  const handleStart = () => {
-    vapi.start();
+  const handleStart = async () => {
+    setLoading(true);
+    const data = await startAssistant(firstName, lastName, email, phone);
+    setCallId(data.id);
+    setLoading(false);
   };
 
-  
+  const handleStop = async () => {
+    stopAssistant();
+  };
     
   return (
     <main className="min-h-screen bg-background">
@@ -112,7 +125,7 @@ export default function Home() {
           <div className="flex justify-center gap-4">
             <Button 
               asChild
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0"
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
             >
               <a href="#projects">View Projects</a>
             </Button>
@@ -184,7 +197,7 @@ export default function Home() {
         >
           <h2 className="text-3xl font-bold mb-8">About Me</h2>
           <p className="text-lg text-muted-foreground mb-6">
-            I've been developing innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation / engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's work together to build the future! 🚀 💫 
+            I've been developing innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation / engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's make your dreams a reality! 🚀 💫 
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>
@@ -217,8 +230,7 @@ export default function Home() {
         >
           <h2 className="text-3xl font-bold mb-8">Get in Touch</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Interested in working together? Feel free to reach out through any of
-            these channels.
+            Email me with your inquiry, or chat now with my AI assistant to schedule a consultation.
           </p>
           <div className="flex justify-center gap-6">
             <Button size="lg" asChild>
@@ -227,15 +239,111 @@ export default function Home() {
                 Email Me
               </a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            {/* <Button size="lg" variant="outline" asChild>
               <a href="https://www.linkedin.com/in/rashadabdulsalaam/" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="mr-2 h-5 w-5" />
                 Connect
               </a>
+            </Button> */}
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
+              size="lg"
+              // onClick={() => !showContactForm && !callStarted && !loading && !loadingResult && !callResult ? setShowContactForm(true) : setShowContactForm(false)}
+              onClick={handleStart}
+              disabled={loading || loadingResult || callStarted}
+            >
+              <Phone className="mr-2 h-5 w-5" />
+              AI Inquiry Call
             </Button>
           </div>
           {/* Contact Form */}
-          {/* <ContactForm handleSubmit={handleSubmit} handleStart={handleStart} callStarted={callStarted} /> */}
+          { showContactForm && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <br />
+            <h3 className="text-lg font-semibold">Leave some details and chat with an agent!</h3>
+            
+            {/* Names row */}
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                <label htmlFor="firstName" className="block text-sm font-medium text-left">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div className="flex-1 space-y-2">
+                <label htmlFor="lastName" className="block text-sm font-medium text-left">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Email and Phone row */}
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                <label htmlFor="email" className="block text-sm font-medium text-left">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div className="flex-1 space-y-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-left">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            {!callStarted && (
+              <Button 
+                onClick={handleStart} 
+                type="submit" 
+                className="w-full"
+                disabled={!allFieldsFilled}
+              >
+                Start Inquiry Call
+              </Button>
+            )}
+          </form>
+          )}
+          {(loading || loadingResult) && (
+            <div className="loading"></div>
+          )}
+          {callStarted && (
+            <ActiveCallDetails 
+            isSpeaking={assistantIsSpeaking} 
+            volume={volumeLevel} 
+            endCallCallback={handleStop}
+            />
+          )}
         </motion.div>
       </section>
 
