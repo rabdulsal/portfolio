@@ -18,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      
       <body className={inter.className}>
+        
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -28,6 +30,10 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+
+        {/* Botpress Webchat */}
+        <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+        <script src="https://files.bpcontent.cloud/2025/03/09/22/20250309224320-1WWO1AQF.js"></script>
       </body>
     </html>
   );
