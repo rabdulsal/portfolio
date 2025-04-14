@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from "@/components/ui/progress";
 import { cloudinaryConfig } from '@/lib/cloudinary';
+import { projectOperations, type Project } from '@/lib/supabase';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from 'next/navigation';
 
 interface ContentUploaderProps {
   onUploadSuccess?: (url: string) => void;
+  onProjectCreated?: () => void;
 }
 
 interface StatusMessage {
@@ -14,7 +19,8 @@ interface StatusMessage {
   text: string;
 }
 
-export default function ContentUploader({ onUploadSuccess }: ContentUploaderProps) {
+export default function ContentUploader({ onUploadSuccess, onProjectCreated }: ContentUploaderProps) {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -22,6 +28,12 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
   const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [createdProject, setCreatedProject] = useState<Project | null>(null);
+
+  // Project details state
+  const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -32,11 +44,47 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
       setStatusMessage(null);
       setUploadedUrl(null);
       setUploadProgress(0);
+      setCreatedProject(null);
+    }
+  };
+
+  const resetForm = () => {
+    setProjectName('');
+    setProjectDescription('');
+    setWebsiteUrl('');
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setUploadedUrl(null);
+    setStatusMessage(null);
+    setCreatedProject(null);
+  };
+
+  const validateWebsiteUrl = (url: string): boolean => {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !projectName.trim()) {
+      setStatusMessage({
+        type: 'error',
+        text: 'Please provide both an image and a project name'
+      });
+      return;
+    }
+
+    if (websiteUrl && !validateWebsiteUrl(websiteUrl)) {
+      setStatusMessage({
+        type: 'error',
+        text: 'Please enter a valid website URL (including http:// or https://)'
+      });
+      return;
+    }
 
     try {
       setUploading(true);
@@ -79,14 +127,29 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
       // Get the secure URL from the response
       const secureUrl = data.secure_url;
       setUploadedUrl(secureUrl);
+
+      // Create project in Supabase
+      const newProject = await projectOperations.createProject({
+        name: projectName,
+        description: projectDescription,
+        image_url: secureUrl,
+        website_url: websiteUrl || undefined,
+      });
+
+      setCreatedProject(newProject);
       setStatusMessage({
         type: 'success',
-        text: 'File uploaded successfully!'
+        text: 'Project created successfully!'
       });
 
       if (onUploadSuccess) {
         onUploadSuccess(secureUrl);
       }
+
+      if (onProjectCreated) {
+        onProjectCreated();
+      }
+
     } catch (error) {
       console.error('Error uploading file:', error);
       setStatusMessage({
@@ -98,10 +161,67 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
     }
   };
 
+  if (createdProject) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-green-50 text-green-800 p-6 rounded-lg border border-green-200">
+          <h3 className="text-lg font-semibold mb-2">Project Created Successfully! 🎉</h3>
+          <div className="space-y-4">
+            <div>
+              <p className="font-medium">Project Name:</p>
+              <p>{createdProject.name}</p>
+            </div>
+            {createdProject.description && (
+              <div>
+                <p className="font-medium">Description:</p>
+                <p>{createdProject.description}</p>
+              </div>
+            )}
+            {createdProject.website_url && (
+              <div>
+                <p className="font-medium">Website:</p>
+                <a 
+                  href={createdProject.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 break-all"
+                >
+                  {createdProject.website_url}
+                </a>
+              </div>
+            )}
+            <div>
+              <p className="font-medium">Preview:</p>
+              <img 
+                src={createdProject.image_url}
+                alt={createdProject.name}
+                className="mt-2 max-w-md rounded-lg shadow-md"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <Button
+            onClick={resetForm}
+            variant="outline"
+          >
+            Create Another Project
+          </Button>
+          <Button
+            onClick={() => router.push('/')}
+          >
+            View All Projects
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Status Message */}
-      {statusMessage && (
+      {statusMessage && !createdProject && (
         <div
           className={`p-4 rounded-md ${
             statusMessage.type === 'success' 
@@ -126,6 +246,49 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
         </div>
       )}
 
+      {/* Project Details Form */}
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="projectName" className="block text-sm font-medium mb-1">
+            Project Name *
+          </label>
+          <Input
+            id="projectName"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="Enter project name"
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="projectDescription" className="block text-sm font-medium mb-1">
+            Project Description
+          </label>
+          <Textarea
+            id="projectDescription"
+            value={projectDescription}
+            onChange={(e) => setProjectDescription(e.target.value)}
+            placeholder="Enter project description"
+            className="w-full min-h-[100px]"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="websiteUrl" className="block text-sm font-medium mb-1">
+            Website URL
+          </label>
+          <Input
+            id="websiteUrl"
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://your-project-website.com"
+            className="w-full"
+          />
+        </div>
+      </div>
+
       <div className="flex items-center gap-4">
         <input
           type="file"
@@ -143,9 +306,9 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
         {selectedFile && (
           <Button
             onClick={handleUpload}
-            disabled={uploading}
+            disabled={uploading || !projectName.trim()}
           >
-            {uploading ? 'Uploading...' : 'Upload'}
+            {uploading ? 'Uploading...' : 'Create Project'}
           </Button>
         )}
       </div>
@@ -160,6 +323,7 @@ export default function ContentUploader({ onUploadSuccess }: ContentUploaderProp
 
       {previewUrl && (
         <div className="mt-4">
+          <p className="text-sm font-medium mb-2">Image Preview:</p>
           <img
             src={previewUrl}
             alt="Preview"

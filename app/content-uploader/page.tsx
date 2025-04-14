@@ -10,7 +10,10 @@ export default function ContentUploaderPage() {
         <ContentUploader 
           onUploadSuccess={(url) => {
             console.log('Uploaded image URL:', url);
-            // You can add additional handling here, like showing a success message
+          }}
+          onProjectCreated={() => {
+            // Refresh projects list or update UI
+            console.log('Project created successfully');
           }}
         />
       </div>
