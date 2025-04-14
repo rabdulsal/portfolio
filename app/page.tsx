@@ -76,6 +76,9 @@ export default function Home() {
             <Terminal className="h-8 w-8" />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
+                <a href="/content-uploader">Upload Content</a>
+              </Button>
+              <Button variant="ghost" asChild>
                 <a href="#contact">Contact</a>
               </Button>
             </div>
