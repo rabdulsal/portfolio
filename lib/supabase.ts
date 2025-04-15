@@ -4,10 +4,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('Missing Supabase environment variables');
+  }
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Initialize with empty strings if variables are missing (for static export)
+export const supabase = createClient(
+  supabaseUrl || '',
+  supabaseAnonKey || ''
+);
 
 // Types for our projects table
 export interface Project {
