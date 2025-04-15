@@ -9,6 +9,8 @@ import { useInView } from "react-intersection-observer";
 import { startAssistant, stopAssistant } from "@/components/ai";
 import { vapi } from "@/components/ai";
 import ActiveCallDetails from "@/components/custom/ActiveCallDetails";
+import ProjectCarousel from "@/components/custom/ProjectCarousel";
+import { projectOperations, type Project } from "@/lib/supabase";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -31,6 +33,8 @@ export default function Home() {
   const [callResult, setCallResult] = useState(null);
   const [loadingResult, setLoadingResult] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   
 
   useEffect(() => {
@@ -49,6 +53,21 @@ export default function Home() {
     }).on("volume-level", (volume) => {
       setVolumeLevel(volume);
     })
+  }, []);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await projectOperations.getProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,7 +95,7 @@ export default function Home() {
             <Terminal className="h-8 w-8" />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
-                <a href="/content-uploader">Upload Content</a>
+                <a href="/content-uploader" style={{ color: 'hsl(var(--background) / 0.8' }}>^</a>
               </Button>
               <Button variant="ghost" asChild>
                 <a href="#contact">Contact</a>
@@ -112,30 +131,82 @@ export default function Home() {
         {/* Gradient Fade to Bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10"></div>
         
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={heroInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-6 px-4 z-20"
-        >
-          <h1 className="text-4xl sm:text-6xl font-bold">
-            Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-muted-foreground">
-            AI Engineer | App Developer
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button 
-              asChild
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
-            >
-              <a href="#projects">View Projects</a>
-            </Button>
-            <Button variant="outline" asChild className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20">
-              <a href="#contact">Get in Touch</a>
-            </Button>
-          </div>
-        </motion.div>
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-0 z-20">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={heroInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative block lg:hidden mb-8"
+          >
+            {/* Image Container with Glow Effect */}
+            <div className="relative">
+              {/* Outer Glow */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
+              
+              {/* Image */}
+              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
+                <img
+                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
+                  alt="Rashad Abdul-Salaam"
+                  className="w-[280px] h-[280px] object-cover"
+                />
+              </div>
+              
+              {/* Inner Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={heroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="text-center lg:text-left space-y-6 max-w-xl lg:pr-4"
+          >
+            <h1 className="text-4xl sm:text-6xl font-bold">
+              Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
+            </h1>
+            <p className="text-xl sm:text-2xl text-muted-foreground">
+              AI Engineer | App Developer
+            </p>
+            <div className="flex justify-center lg:justify-start gap-4">
+              <Button 
+                asChild
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
+              >
+                <a href="#projects">View Projects</a>
+              </Button>
+              <Button variant="outline" asChild className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20">
+                <a href="#contact">Get in Touch</a>
+              </Button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={heroInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative hidden lg:block pl-4"
+          >
+            {/* Image Container with Glow Effect */}
+            <div className="relative">
+              {/* Outer Glow */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
+              
+              {/* Image */}
+              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
+                <img
+                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
+                  alt="Rashad Abdul-Salaam"
+                  className="w-[350px] h-[350px] object-cover"
+                />
+              </div>
+              
+              {/* Inner Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Projects Section */}
@@ -151,37 +222,17 @@ export default function Home() {
           className="max-w-7xl mx-auto"
         >
           <h2 className="text-3xl font-bold mb-12 text-center">Featured Projects</h2>
-          <div className="max-w-2xl mx-auto">
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video relative overflow-hidden rounded-lg mb-6">
-                <img
-                  src="/images/face_rater_thumb.jpg"
-                  alt="FaceRater App"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-2xl font-semibold mb-3">FaceRater AI</h3>
-              <p className="text-muted-foreground mb-6">
-                A fun and entertaining iOS application that leverages advanced facial recognition AI 
-                to analyze and rate facial features. Built with SwiftUI for iOS, TensorFlow/PyTorch for model training, and Firebase for push notifications.
-              </p>
-              <div className="flex flex-wrap gap-3 mb-6">
-                <span className="px-3 py-1 bg-primary/10 rounded-full text-sm">SwiftUI</span>
-                <span className="px-3 py-1 bg-primary/10 rounded-full text-sm">Core ML</span>
-                <span className="px-3 py-1 bg-primary/10 rounded-full text-sm">Vision Framework</span>
-                <span className="px-3 py-1 bg-primary/10 rounded-full text-sm">TensorFlow</span>
-                <span className="px-3 py-1 bg-primary/10 rounded-full text-sm">PyTorch</span>
-              </div>
-              <div className="flex justify-center">
-                <Button variant="outline" size="lg" asChild>
-                  <a href="https://github.com/stars/rabdulsal/lists/facerater-ai-codebases" target="_blank" rel="noopener noreferrer">
-                    <Github className="mr-2 h-5 w-5" />
-                    View Code
-                  </a>
-                </Button>
-              </div>
-            </Card>
-          </div>
+          {loadingProjects ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : projects.length > 0 ? (
+            <ProjectCarousel projects={projects} />
+          ) : (
+            <div className="text-center text-muted-foreground">
+              No projects available yet.
+            </div>
+          )}
         </motion.div>
       </section>
 
