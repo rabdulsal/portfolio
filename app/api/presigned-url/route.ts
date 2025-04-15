@@ -5,7 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+// Return a 404 for all requests in production
+export async function GET() {
+  return new NextResponse(null, { status: 404 });
+}
+
+export async function POST() {
+  return new NextResponse(null, { status: 404 });
+}
+
+export async function POST(request: Request) {
   try {
     // Get file info from query params
     const { searchParams } = new URL(request.url);

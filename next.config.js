@@ -7,9 +7,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Disable server-side features for static export
+  // Disable any dynamic features for static export
   experimental: {
-    appDir: true,
+    // Remove appDir as it's now default
   },
 };
 
