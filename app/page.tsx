@@ -110,9 +110,6 @@ export default function Home() {
             <Terminal className="h-8 w-8" />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
-                <a href="/content-uploader" style={{ color: 'hsl(var(--background) / 0.8' }}>^</a>
-              </Button>
-              <Button variant="ghost" asChild>
                 <a href="#about">About</a>
               </Button>
             </div>
