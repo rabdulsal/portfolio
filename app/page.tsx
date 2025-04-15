@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Github, Linkedin, Mail, Terminal, Phone } from "lucide-react";
+import { Github, Linkedin, Mail, Terminal, Phone, X } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { startAssistant, stopAssistant } from "@/components/ai";
 import { vapi } from "@/components/ai";
 import ActiveCallDetails from "@/components/custom/ActiveCallDetails";
 import ProjectCarousel from "@/components/custom/ProjectCarousel";
 import { projectOperations, type Project } from "@/lib/supabase";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -35,6 +37,10 @@ export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [showQuickForm, setShowQuickForm] = useState(false);
+  const [quickFormName, setQuickFormName] = useState("");
+  const [quickFormEmail, setQuickFormEmail] = useState("");
+  const [quickFormMessage, setQuickFormMessage] = useState("");
   
 
   useEffect(() => {
@@ -85,6 +91,15 @@ export default function Home() {
   const handleStop = async () => {
     stopAssistant();
   };
+
+  const handleQuickFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission here
+    setShowQuickForm(false);
+    setQuickFormName("");
+    setQuickFormEmail("");
+    setQuickFormMessage("");
+  };
     
   return (
     <main className="min-h-screen bg-background">
@@ -98,7 +113,7 @@ export default function Home() {
                 <a href="/content-uploader" style={{ color: 'hsl(var(--background) / 0.8' }}>^</a>
               </Button>
               <Button variant="ghost" asChild>
-                <a href="#contact">Contact</a>
+                <a href="#about">About</a>
               </Button>
             </div>
           </div>
@@ -108,7 +123,7 @@ export default function Home() {
       {/* Hero Section with Deep Purple Gradient and Grid Effect */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden"
+        className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
         style={{
           background: "linear-gradient(to bottom, #1a0b2e, #121212)",
         }}
@@ -131,32 +146,8 @@ export default function Home() {
         {/* Gradient Fade to Bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10"></div>
         
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-0 z-20">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={heroInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative block lg:hidden mb-8"
-          >
-            {/* Image Container with Glow Effect */}
-            <div className="relative">
-              {/* Outer Glow */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
-              
-              {/* Image */}
-              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
-                <img
-                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
-                  alt="Rashad Abdul-Salaam"
-                  className="w-[280px] h-[280px] object-cover"
-                />
-              </div>
-              
-              {/* Inner Glow */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
-            </div>
-          </motion.div>
-
+        {/* Hero Content */}
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-0 z-20 -mt-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
@@ -167,17 +158,21 @@ export default function Home() {
               Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground">
-              AI Engineer | App Developer
+              Web and mobile engineer helping businesses grow with AI and automation.
             </p>
             <div className="flex justify-center lg:justify-start gap-4">
-              <Button 
+              <Button
                 asChild
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
               >
                 <a href="#projects">View Projects</a>
               </Button>
-              <Button variant="outline" asChild className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20">
-                <a href="#contact">Get in Touch</a>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowQuickForm(true)}
+                className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20"
+              >
+                Get in Touch
               </Button>
             </div>
           </motion.div>
@@ -188,7 +183,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative hidden lg:block pl-4"
           >
-            {/* Image Container with Glow Effect */}
+            {/* Desktop Image Container with Glow Effect */}
             <div className="relative">
               {/* Outer Glow */}
               <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
@@ -207,6 +202,79 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+
+        {/* Remove the CTA and Form section */}
+        {showQuickForm && (
+          <div className="container mx-auto px-4 z-20 mt-12">
+            <div className="max-w-[500px] mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className="relative"
+              >
+                <div className="bg-background/20 backdrop-blur-sm p-6 rounded-xl border border-purple-500/20">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setShowQuickForm(false)}
+                    className="absolute -right-2 -top-2 h-8 w-8 rounded-full bg-background/50 hover:bg-background/70 border border-purple-500/20"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <form onSubmit={handleQuickFormSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label htmlFor="quick-name" className="block text-sm font-medium">
+                          Name
+                        </label>
+                        <Input
+                          id="quick-name"
+                          value={quickFormName}
+                          onChange={(e) => setQuickFormName(e.target.value)}
+                          placeholder="Your name"
+                          className="bg-background/50 border-purple-500/30 focus:border-purple-500/50"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="quick-email" className="block text-sm font-medium">
+                          Email
+                        </label>
+                        <Input
+                          id="quick-email"
+                          type="email"
+                          value={quickFormEmail}
+                          onChange={(e) => setQuickFormEmail(e.target.value)}
+                          placeholder="your@email.com"
+                          className="bg-background/50 border-purple-500/30 focus:border-purple-500/50"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="quick-message" className="block text-sm font-medium">
+                        Business Need (Optional)
+                      </label>
+                      <Textarea
+                        id="quick-message"
+                        value={quickFormMessage}
+                        onChange={(e) => setQuickFormMessage(e.target.value)}
+                        placeholder="Tell us about your business automation needs..."
+                        className="bg-background/50 border-purple-500/30 focus:border-purple-500/50 min-h-[100px]"
+                      />
+                    </div>
+                    <Button 
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
+                    >
+                      Let's Connect
+                    </Button>
+                  </form>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Projects Section */}
