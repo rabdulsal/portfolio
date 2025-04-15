@@ -4,7 +4,13 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
+  images: {
+    unoptimized: true,
+  },
+  // Disable server-side features for static export
+  experimental: {
+    appDir: true,
+  },
 };
 
 module.exports = nextConfig;

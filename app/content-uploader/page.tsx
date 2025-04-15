@@ -1,12 +1,9 @@
-export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
-
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 export default function ContentUploaderPage() {
-  // For production builds, always redirect to home
+  // Always return 404 in production
   if (process.env.NODE_ENV === 'production') {
-    redirect('/');
+    notFound();
   }
   
   return null;
