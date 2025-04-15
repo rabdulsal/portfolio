@@ -13,6 +13,7 @@ import ProjectCarousel from "@/components/custom/ProjectCarousel";
 import { projectOperations, type Project } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { staticProjects } from '@/lib/staticProjects';
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -61,20 +62,21 @@ export default function Home() {
     })
   }, []);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await projectOperations.getProjects();
-        setProjects(data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      } finally {
-        setLoadingProjects(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     try {
+  //       const data = await projectOperations.getProjects();
+  //       console.log(data);
+  //       setProjects(data);
+  //     } catch (error) {
+  //       console.error('Error fetching projects:', error);
+  //     } finally {
+  //       setLoadingProjects(false);
+  //     }
+  //   };
 
-    fetchProjects();
-  }, []);
+  //   fetchProjects();
+  // }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -287,7 +289,7 @@ export default function Home() {
           className="max-w-7xl mx-auto"
         >
           <h2 className="text-3xl font-bold mb-12 text-center">Featured Projects</h2>
-          {loadingProjects ? (
+          {/* {loadingProjects ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
@@ -297,7 +299,8 @@ export default function Home() {
             <div className="text-center text-muted-foreground">
               No projects available yet.
             </div>
-          )}
+          )} */}
+          <ProjectCarousel projects={staticProjects} />
         </motion.div>
       </section>
 
