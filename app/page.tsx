@@ -148,10 +148,33 @@ export default function Home() {
         {/* Hero Content */}
         <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-0 z-20 -mt-16">
           <motion.div
+            initial={{ opacity: 0, x: 0, y: 20 }}
+            animate={heroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative order-1 lg:order-2 mb-8 lg:mb-0 lg:pl-4"
+          >
+            {/* Image Container with Glow Effect */}
+            <div className="relative flex justify-center">
+              {/* Outer Glow */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
+              {/* Image */}
+              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
+                <img
+                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
+                  alt="Rashad Abdul-Salaam"
+                  className="w-40 h-40 sm:w-56 sm:h-56 lg:w-[350px] lg:h-[350px] object-cover"
+                />
+              </div>
+              {/* Inner Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
+            </div>
+          </motion.div>
+
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="text-center lg:text-left space-y-6 max-w-xl lg:pr-4"
+            className="text-center lg:text-left space-y-6 max-w-xl lg:pr-4 order-2 lg:order-1"
           >
             <h1 className="text-4xl sm:text-6xl font-bold">
               Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
@@ -173,31 +196,6 @@ export default function Home() {
               >
                 Get in Touch
               </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={heroInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative hidden lg:block pl-4"
-          >
-            {/* Desktop Image Container with Glow Effect */}
-            <div className="relative">
-              {/* Outer Glow */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
-              
-              {/* Image */}
-              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
-                <img
-                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
-                  alt="Rashad Abdul-Salaam"
-                  className="w-[350px] h-[350px] object-cover"
-                />
-              </div>
-              
-              {/* Inner Glow */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
             </div>
           </motion.div>
         </div>
