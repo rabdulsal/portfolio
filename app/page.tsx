@@ -42,6 +42,7 @@ export default function Home() {
   const [quickFormName, setQuickFormName] = useState("");
   const [quickFormEmail, setQuickFormEmail] = useState("");
   const [quickFormMessage, setQuickFormMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
 
   useEffect(() => {
@@ -94,13 +95,61 @@ export default function Home() {
     stopAssistant();
   };
 
-  const handleQuickFormSubmit = (e: React.FormEvent) => {
+  const handleQuickFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    setShowQuickForm(false);
-    setQuickFormName("");
-    setQuickFormEmail("");
-    setQuickFormMessage("");
+    
+    if (!quickFormName || !quickFormEmail) {
+      console.error('Name and email are required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/.netlify/functions/submit-form', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: quickFormName,
+          email: quickFormEmail,
+          message: quickFormMessage || 'No message provided'
+        }),
+      });
+
+      // First check the content type of the response
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        // Handle non-JSON response
+        const text = await response.text();
+        console.error('Received non-JSON response:', text);
+        throw new Error('Invalid response format from server');
+      }
+
+      if (response.ok) {
+        // Success! Clear the form and close it
+        setShowQuickForm(false);
+        setQuickFormName("");
+        setQuickFormEmail("");
+        setQuickFormMessage("");
+        console.log('Form submitted successfully:', data);
+      } else {
+        // Handle error
+        console.error('Form submission failed:', data.error);
+        throw new Error(data.error || 'Failed to submit form');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // You might want to show an error toast here
+    } finally {
+      setIsSubmitting(false);
+    }
   };
     
   return (
@@ -263,8 +312,9 @@ export default function Home() {
                     <Button 
                       type="submit"
                       className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
+                      disabled={isSubmitting || !quickFormName || !quickFormEmail}
                     >
-                      Let's Connect
+                      {isSubmitting ? 'Submitting...' : 'Let\'s Connect'}
                     </Button>
                   </form>
                 </div>
