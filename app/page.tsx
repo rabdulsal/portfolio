@@ -16,6 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { staticProjects } from '@/lib/staticProjects';
 import Image from 'next/image';
 
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
   const [projectsRef, projectsInView] = useInView({ triggerOnce: true });
@@ -160,11 +162,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <Image 
-              src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png"
               alt="Logo"
               width={32}
               height={32}
               className="rounded-sm"
+              src={`https://res.cloudinary.com/${cloudName}/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png`}
             />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
@@ -216,9 +218,9 @@ export default function Home() {
               {/* Image */}
               <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
                 <img
-                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
                   alt="Rashad Abdul-Salaam"
                   className="w-40 h-40 sm:w-56 sm:h-56 lg:w-[350px] lg:h-[350px] object-cover"
+                  src={`https://res.cloudinary.com/${cloudName}/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png`}
                 />
               </div>
               {/* Inner Glow */}

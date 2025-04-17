@@ -6,9 +6,17 @@ import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const iconUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png`;
+
 export const metadata: Metadata = {
-  title: 'Portfolio - AI & Automation Engineer | iOS Developer',
-  description: 'Software developer specializing in AI, automation, and iOS development',
+  title: 'Rashad Abdul-Salaam | Web & Mobile Engineer',
+  description: 'Web and mobile engineer helping businesses grow with AI and automation.',
+  icons: {
+    icon: iconUrl,
+    shortcut: iconUrl,
+    apple: iconUrl,
+  },
 };
 
 export default function RootLayout({

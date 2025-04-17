@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from "@/components/ui/progress";
 import { projectOperations, type Project } from '@/lib/supabase';
@@ -12,6 +12,9 @@ import { Separator } from "@/components/ui/separator";
 interface ContentUploaderProps {
   onUploadSuccess?: (url: string) => void;
   onProjectCreated?: () => void;
+  onProjectPreviewChange?: (url: string | null) => void;
+  onQuickPreviewChange?: (url: string | null) => void;
+  onStatusChange?: (status: { type: 'success' | 'error' | null; message: string | null }) => void;
 }
 
 interface StatusMessage {
@@ -19,7 +22,13 @@ interface StatusMessage {
   text: string;
 }
 
-export default function ContentUploader({ onUploadSuccess, onProjectCreated }: ContentUploaderProps) {
+export default function ContentUploader({ 
+  onUploadSuccess, 
+  onProjectCreated,
+  onProjectPreviewChange,
+  onQuickPreviewChange,
+  onStatusChange 
+}: ContentUploaderProps) {
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -44,13 +53,37 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
   const [projectDescription, setProjectDescription] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
 
+  // Clean up URLs when component unmounts or when URLs change
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (cloudinaryPreviewUrl) {
+        URL.revokeObjectURL(cloudinaryPreviewUrl);
+      }
+    };
+  }, [cloudinaryPreviewUrl]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Clean up old preview URL if it exists
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      onProjectPreviewChange?.(url);
       setStatusMessage(null);
+      onStatusChange?.({ type: null, message: null });
       setUploadedUrl(null);
       setUploadProgress(0);
       setCreatedProject(null);
@@ -60,9 +93,15 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
   const handleCloudinaryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Clean up old preview URL if it exists
+      if (cloudinaryPreviewUrl) {
+        URL.revokeObjectURL(cloudinaryPreviewUrl);
+      }
+
       setCloudinaryFile(file);
       const url = URL.createObjectURL(file);
       setCloudinaryPreviewUrl(url);
+      onQuickPreviewChange?.(url);
       setCloudinaryStatusMessage(null);
       setCloudinaryUploadedUrl(null);
       setCloudinaryProgress(0);
@@ -70,19 +109,27 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
   };
 
   const resetForm = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setProjectName('');
     setProjectDescription('');
     setWebsiteUrl('');
     setSelectedFile(null);
     setPreviewUrl(null);
+    onProjectPreviewChange?.(null);
     setUploadedUrl(null);
     setStatusMessage(null);
     setCreatedProject(null);
   };
 
   const resetCloudinaryForm = () => {
+    if (cloudinaryPreviewUrl) {
+      URL.revokeObjectURL(cloudinaryPreviewUrl);
+    }
     setCloudinaryFile(null);
     setCloudinaryPreviewUrl(null);
+    onQuickPreviewChange?.(null);
     setCloudinaryUploadedUrl(null);
     setCloudinaryStatusMessage(null);
     setCloudinaryProgress(0);
@@ -149,24 +196,29 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
 
   const handleUpload = async () => {
     if (!selectedFile || !projectName.trim()) {
+      const errorMessage = 'Please provide both an image and a project name';
       setStatusMessage({
         type: 'error',
-        text: 'Please provide both an image and a project name'
+        text: errorMessage
       });
+      onStatusChange?.({ type: 'error', message: errorMessage });
       return;
     }
 
     if (websiteUrl && !validateWebsiteUrl(websiteUrl)) {
+      const errorMessage = 'Please enter a valid website URL (including http:// or https://)';
       setStatusMessage({
         type: 'error',
-        text: 'Please enter a valid website URL (including http:// or https://)'
+        text: errorMessage
       });
+      onStatusChange?.({ type: 'error', message: errorMessage });
       return;
     }
 
     try {
       setUploading(true);
       setStatusMessage(null);
+      onStatusChange?.({ type: null, message: null });
       setUploadProgress(0);
 
       // Simulate initial progress
@@ -185,6 +237,7 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
       setUploadProgress(100);
 
       setUploadedUrl(secureUrl);
+      onUploadSuccess?.(secureUrl);
 
       // Create project in Supabase
       const newProject = await projectOperations.createProject({
@@ -195,25 +248,21 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
       });
 
       setCreatedProject(newProject);
+      const successMessage = 'Project created successfully!';
       setStatusMessage({
         type: 'success',
-        text: 'Project created successfully!'
+        text: successMessage
       });
-
-      if (onUploadSuccess) {
-        onUploadSuccess(secureUrl);
-      }
-
-      if (onProjectCreated) {
-        onProjectCreated();
-      }
-
+      onStatusChange?.({ type: 'success', message: successMessage });
+      onProjectCreated?.();
+      resetForm();
     } catch (error) {
-      console.error('Error uploading file:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred during upload';
       setStatusMessage({
         type: 'error',
-        text: error instanceof Error ? error.message : 'Failed to upload file. Please try again.'
+        text: errorMessage
       });
+      onStatusChange?.({ type: 'error', message: errorMessage });
     } finally {
       setUploading(false);
     }
@@ -378,7 +427,7 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
               placeholder="Enter project description"
-              className="w-full min-h-[100px]"
+              className="w-full"
             />
           </div>
 
@@ -388,55 +437,49 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
             </label>
             <Input
               id="websiteUrl"
-              type="url"
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}
               placeholder="https://your-project-website.com"
               className="w-full"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Project Image *
+            </label>
+            <div className="space-y-2">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="outline"
+                className="w-full"
+              >
+                Select Project Image
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            className="hidden"
-          />
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-          >
-            Select Project Image
-          </Button>
-          {selectedFile && (
-            <Button
-              onClick={handleUpload}
-              disabled={uploading || !projectName.trim()}
-            >
-              {uploading ? 'Uploading...' : 'Create Project'}
-            </Button>
-          )}
-        </div>
+        <Button
+          onClick={handleUpload}
+          disabled={!selectedFile || !projectName || uploading}
+          className="w-full"
+        >
+          {uploading ? 'Uploading...' : 'Upload Project'}
+        </Button>
 
         {/* Upload Progress */}
-        {(uploading || uploadProgress > 0) && (
+        {uploadProgress > 0 && (
           <div className="space-y-2">
             <Progress value={uploadProgress} className="w-full" />
             <p className="text-sm text-gray-500 text-center">{uploadProgress}% Complete</p>
-          </div>
-        )}
-
-        {previewUrl && (
-          <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Image Preview:</p>
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="max-w-full h-auto rounded-lg"
-            />
           </div>
         )}
       </div>
@@ -502,17 +545,6 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
           <div className="space-y-2">
             <Progress value={cloudinaryProgress} className="w-full" />
             <p className="text-sm text-gray-500 text-center">{cloudinaryProgress}% Complete</p>
-          </div>
-        )}
-
-        {cloudinaryPreviewUrl && (
-          <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Image Preview:</p>
-            <img
-              src={cloudinaryPreviewUrl}
-              alt="Preview"
-              className="max-w-full h-auto rounded-lg"
-            />
           </div>
         )}
       </div>

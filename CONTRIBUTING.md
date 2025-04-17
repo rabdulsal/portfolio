@@ -66,6 +66,17 @@
 - When fixing an issue or bug, do not introduce a new pattern or technology without first exhausting all options for the existing implementation. And if you finally do this, make sure to remove the old implementation afterwards so we don't have duplicate logic
 - Never overwrite my .env file without first asking and confirming
 
+## Coding Workflow Preferences
+
+### Focus and Scope
+- Focus on the areas of code relevant to the task
+- Do not touch code that is unrelated to the task
+- Write thorough tests for all major functionality
+- Always think about what other methods and areas of code might be affected by code changes
+
+### Architecture Stability
+- Avoid making major changes to the patterns and architecture of how a feature works, after it has shown to work well, unless explicitly instructed
+
 ## File Structure
 ```
 portfolio/
