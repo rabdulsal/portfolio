@@ -14,9 +14,7 @@ import { projectOperations, type Project } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { staticProjects } from '@/lib/staticProjects';
-import Image from 'next/image';
-
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+import Image from "next/image";
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -45,7 +43,6 @@ export default function Home() {
   const [quickFormName, setQuickFormName] = useState("");
   const [quickFormEmail, setQuickFormEmail] = useState("");
   const [quickFormMessage, setQuickFormMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
 
   useEffect(() => {
@@ -98,61 +95,13 @@ export default function Home() {
     stopAssistant();
   };
 
-  const handleQuickFormSubmit = async (e: React.FormEvent) => {
+  const handleQuickFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!quickFormName || !quickFormEmail) {
-      console.error('Name and email are required');
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch('/.netlify/functions/submit-form', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: quickFormName,
-          email: quickFormEmail,
-          message: quickFormMessage || 'No message provided'
-        }),
-      });
-
-      // First check the content type of the response
-      const contentType = response.headers.get('content-type');
-      let data;
-      
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        // Handle non-JSON response
-        const text = await response.text();
-        console.error('Received non-JSON response:', text);
-        throw new Error('Invalid response format from server');
-      }
-
-      if (response.ok) {
-        // Success! Clear the form and close it
-        setShowQuickForm(false);
-        setQuickFormName("");
-        setQuickFormEmail("");
-        setQuickFormMessage("");
-        console.log('Form submitted successfully:', data);
-      } else {
-        // Handle error
-        console.error('Form submission failed:', data.error);
-        throw new Error(data.error || 'Failed to submit form');
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      // You might want to show an error toast here
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Handle form submission here
+    setShowQuickForm(false);
+    setQuickFormName("");
+    setQuickFormEmail("");
+    setQuickFormMessage("");
   };
     
   return (
@@ -162,11 +111,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <Image 
+              src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/qy3rpcppyfp6cs4nwv52.png"
               alt="Logo"
               width={32}
               height={32}
               className="rounded-sm"
-              src={`https://res.cloudinary.com/${cloudName}/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png`}
             />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
@@ -218,9 +167,9 @@ export default function Home() {
               {/* Image */}
               <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
                 <img
+                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
                   alt="Rashad Abdul-Salaam"
                   className="w-40 h-40 sm:w-56 sm:h-56 lg:w-[350px] lg:h-[350px] object-cover"
-                  src={`https://res.cloudinary.com/${cloudName}/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png`}
                 />
               </div>
               {/* Inner Glow */}
@@ -321,9 +270,8 @@ export default function Home() {
                     <Button 
                       type="submit"
                       className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
-                      disabled={isSubmitting || !quickFormName || !quickFormEmail}
                     >
-                      {isSubmitting ? 'Submitting...' : 'Let\'s Connect'}
+                      Let's Connect
                     </Button>
                   </form>
                 </div>

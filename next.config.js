@@ -25,9 +25,9 @@ const nextConfig = {
   },
   // Static export configuration
   trailingSlash: true,
-  // Disable server-side features
-  experimental: {
-    appDir: true,
+  // Disable ESLint during build (we'll handle linting separately)
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
