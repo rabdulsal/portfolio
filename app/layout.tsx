@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,8 +41,14 @@ export default function RootLayout({
         </ThemeProvider>
 
         {/* Botpress Webchat */}
-        <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
-        <script src="https://files.bpcontent.cloud/2025/03/09/22/20250309224320-1WWO1AQF.js"></script>
+        <Script 
+          src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"
+          strategy="lazyOnload"
+        />
+        <Script 
+          src="https://files.bpcontent.cloud/2025/03/09/22/20250309224320-1WWO1AQF.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
