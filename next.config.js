@@ -1,10 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Enable React strict mode
+  reactStrictMode: true,
+  
+  // Configure images
   images: {
-    unoptimized: true,
     domains: ['res.cloudinary.com'],
   },
+  
+  // Enable experimental features
+  experimental: {
+    serverActions: true,
+  },
+  
   // Handle optional dependencies
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -19,13 +27,18 @@ const nextConfig = {
     }
     return config;
   },
-  // Ensure environment variables are handled
+  
+  // Environment variables
   env: {
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
-  // Static export configuration
+  
+  // Enable trailing slashes
   trailingSlash: true,
-  // Disable ESLint during build (we'll handle linting separately)
+  
+  // ESLint configuration
   eslint: {
     ignoreDuringBuilds: true,
   },

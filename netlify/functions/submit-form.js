@@ -1,19 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
 
 exports.handler = async (event, context) => {
-  // Set response headers
-  const headers = {
-    'Content-Type': 'application/json',
-    // Enable CORS if needed
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
-
-  // Only allow POST
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers,
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -26,7 +17,6 @@ exports.handler = async (event, context) => {
     if (!name || !email) {
       return {
         statusCode: 400,
-        headers,
         body: JSON.stringify({ error: 'Name and email are required' })
       };
     }
@@ -49,14 +39,12 @@ exports.handler = async (event, context) => {
       console.error('Supabase Error:', error);
       return {
         statusCode: 500,
-        headers,
         body: JSON.stringify({ error: 'Failed to submit form' })
       };
     }
 
     return {
       statusCode: 200,
-      headers,
       body: JSON.stringify({
         success: true,
         data: data[0]
@@ -67,7 +55,6 @@ exports.handler = async (event, context) => {
     console.error('Function Error:', err);
     return {
       statusCode: 500,
-      headers,
       body: JSON.stringify({ error: 'Internal server error' })
     };
   }
