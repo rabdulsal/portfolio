@@ -5,8 +5,6 @@ const nextConfig = {
     unoptimized: true,
     domains: ['res.cloudinary.com'],
   },
-  // Disable any dynamic features for static export
-  experimental: {},
   // Handle optional dependencies
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -21,17 +19,15 @@ const nextConfig = {
     }
     return config;
   },
-  // Disable server-side features
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // Ensure environment variables are handled
   env: {
-    // Only need the public version for client-side image URLs
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  },
+  // Static export configuration
+  trailingSlash: true,
+  // Disable server-side features
+  experimental: {
+    appDir: true,
   },
 };
 
