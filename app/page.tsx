@@ -14,6 +14,7 @@ import { projectOperations, type Project } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { staticProjects } from '@/lib/staticProjects';
+import Image from 'next/image';
 
 export default function Home() {
   const [heroRef, heroInView] = useInView({ triggerOnce: true });
@@ -158,7 +159,13 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-sm z-50 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <Terminal className="h-8 w-8" />
+            <Image 
+              src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="rounded-sm"
+            />
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>
                 <a href="#about">About</a>

@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from "@/components/ui/progress";
-import { cloudinaryConfig } from '@/lib/cloudinary';
 import { projectOperations, type Project } from '@/lib/supabase';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -100,26 +99,52 @@ export default function ContentUploader({ onUploadSuccess, onProjectCreated }: C
   };
 
   const uploadToCloudinary = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', cloudinaryConfig.uploadPreset!);
-    formData.append('cloud_name', cloudinaryConfig.cloudName!);
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Upload failed');
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      throw new Error('Please select an image file');
     }
 
-    return data.secure_url;
+    // Convert file to base64
+    const reader = new FileReader();
+    const base64Promise = new Promise<string>((resolve, reject) => {
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result);
+      };
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    try {
+      const base64 = await base64Promise;
+
+      // Upload using Netlify function
+      const response = await fetch('/.netlify/functions/upload-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      if (!data.url) {
+        throw new Error('No URL returned from upload');
+      }
+
+      return data.url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
   };
 
   const handleUpload = async () => {
