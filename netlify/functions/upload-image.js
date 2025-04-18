@@ -1,4 +1,5 @@
 const { getCloudinaryConfig } = require('./utils/cloudinary');
+const { validateMethod, parseRequestBody, createErrorResponse, createSuccessResponse } = require('./utils/common');
 
 // Validate image data
 function validateImageData(imageData) {
@@ -37,31 +38,25 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Parse and validate request body
-    if (!event.body) {
-      throw new Error('No body provided');
-    }
+    // Validate HTTP method
+    const methodError = validateMethod(event);
+    if (methodError) return methodError;
 
-    const { image } = JSON.parse(event.body);
+    // Parse and validate request body
+    const { image } = parseRequestBody(event);
     validateImageData(image);
 
-    // Get configured Cloudinary instance
+    // Get configured Cloudinary instance and upload
     const cloudinary = getCloudinaryConfig();
-    
-    // Upload image
     const uploadResponse = await cloudinary.uploader.upload(image, {
       resource_type: 'auto'
     });
 
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({
-        success: true,
-        url: uploadResponse.secure_url,
-        public_id: uploadResponse.public_id
-      })
-    };
+    return createSuccessResponse({
+      success: true,
+      url: uploadResponse.secure_url,
+      public_id: uploadResponse.public_id
+    });
 
   } catch (error) {
     console.error('Upload Image Error:', {
@@ -69,13 +64,6 @@ exports.handler = async (event) => {
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
 
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ 
-        error: error.message || 'Failed to upload image',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      })
-    };
+    return createErrorResponse(error);
   }
 }; 

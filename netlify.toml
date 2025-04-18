@@ -1,10 +1,10 @@
 [build]
   command = "npm run build"
+  functions = "netlify/functions/dist"
   publish = ".next"
-  functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "14"
 
 [functions]
   included_files = ["node_modules/**/*"]
