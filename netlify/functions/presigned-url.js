@@ -1,13 +1,6 @@
-const cloudinary = require('cloudinary').v2;
+const { getCloudinaryConfig } = require('./utils/cloudinary');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -27,7 +20,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Generate upload signature
+    const cloudinary = getCloudinaryConfig();
     const timestamp = Math.round((new Date).getTime()/1000);
     const signature = cloudinary.utils.api_sign_request(
       { timestamp, upload_preset },

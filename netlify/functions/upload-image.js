@@ -1,111 +1,77 @@
-const cloudinary = require('cloudinary').v2;
+const { getCloudinaryConfig } = require('./utils/cloudinary');
 
-// Validate environment variables
-function validateEnvironmentVariables() {
-  const required = {
-    'NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME': process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    'CLOUDINARY_API_KEY': process.env.CLOUDINARY_API_KEY,
-    'CLOUDINARY_API_SECRET': process.env.CLOUDINARY_API_SECRET
-  };
-
-  const missing = Object.entries(required)
-    .filter(([_, value]) => !value)
-    .map(([key]) => key);
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+// Validate image data
+function validateImageData(imageData) {
+  if (!imageData) {
+    throw new Error('No image provided in request body');
+  }
+  if (!imageData.startsWith('data:image/')) {
+    throw new Error('Invalid image format. Must be a base64 data URL');
   }
 }
 
-exports.handler = async (event, context) => {
-  // Set CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
+// Handle CORS
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Content-Type': 'application/json'
+};
 
+exports.handler = async (event) => {
   // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers
+      headers: corsHeaders
     };
   }
 
+  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
 
   try {
-    // Validate environment variables first
-    validateEnvironmentVariables();
-
-    // Configure Cloudinary with validated credentials
-    cloudinary.config({
-      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET
-    });
-
+    // Parse and validate request body
     if (!event.body) {
       throw new Error('No body provided');
     }
 
-    const body = JSON.parse(event.body);
-    if (!body.image) {
-      throw new Error('No image provided in request body');
-    }
+    const { image } = JSON.parse(event.body);
+    validateImageData(image);
 
-    // Validate that the image is a base64 string
-    if (!body.image.startsWith('data:image/')) {
-      throw new Error('Invalid image format. Must be a base64 data URL');
-    }
+    // Get configured Cloudinary instance
+    const cloudinary = getCloudinaryConfig();
     
-    // Log configuration (without sensitive data)
-    console.log('Attempting upload with cloud_name:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME);
-    
-    // Try a simpler upload first without folder
-    try {
-      const uploadResponse = await cloudinary.uploader.upload(body.image, {
-        resource_type: 'auto'
-      });
+    // Upload image
+    const uploadResponse = await cloudinary.uploader.upload(image, {
+      resource_type: 'auto'
+    });
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          url: uploadResponse.secure_url,
-          public_id: uploadResponse.public_id
-        })
-      };
-    } catch (uploadError) {
-      console.error('Cloudinary Upload Error:', {
-        message: uploadError.message,
-        error: uploadError
-      });
-      throw uploadError;
-    }
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: true,
+        url: uploadResponse.secure_url,
+        public_id: uploadResponse.public_id
+      })
+    };
 
   } catch (error) {
-    // Enhanced error logging
-    console.error('Function Error:', {
+    console.error('Upload Image Error:', {
       message: error.message,
-      stack: error.stack,
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set',
-      apiKey: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set',
-      apiSecret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set'
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
 
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ 
         error: error.message || 'Failed to upload image',
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined

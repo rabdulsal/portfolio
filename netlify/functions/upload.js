@@ -1,13 +1,6 @@
-const cloudinary = require('cloudinary').v2;
+const { getCloudinaryConfig } = require('./utils/cloudinary');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -27,7 +20,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Upload to Cloudinary
+    const cloudinary = getCloudinaryConfig();
     const result = await cloudinary.uploader.upload(file, {
       upload_preset,
       resource_type: 'auto'

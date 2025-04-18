@@ -1,6 +1,6 @@
-const { createClient } = require('@supabase/supabase-js');
+const { getSupabaseClient } = require('./utils/supabase');
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -22,10 +22,7 @@ exports.handler = async (event, context) => {
     }
 
     // Initialize Supabase client
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const supabase = getSupabaseClient();
 
     // Insert data into Supabase
     const { data, error } = await supabase
