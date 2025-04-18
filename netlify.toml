@@ -4,7 +4,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "14"
+  NODE_VERSION = "18"
 
 [functions]
   included_files = ["node_modules/**/*"]
