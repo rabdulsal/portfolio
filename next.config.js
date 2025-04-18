@@ -3,9 +3,6 @@ const nextConfig = {
   // Enable React strict mode
   reactStrictMode: true,
   
-  // Target serverless environment
-  target: 'serverless',
-  
   // Configure images
   images: {
     domains: ['res.cloudinary.com'],
