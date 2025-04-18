@@ -8,27 +8,21 @@ import { cn } from '@/lib/utils';
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
->(({ className, value = 0, ...props }, ref) => {
-  // Ensure value is between 0 and 100
-  const normalizedValue = Math.min(Math.max(0, value || 0), 100);
-  
-  return (
-    <ProgressPrimitive.Root
-      ref={ref}
-      className={cn(
-        'relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800',
-        className
-      )}
-      {...props}
-      value={normalizedValue}
-    >
-      <ProgressPrimitive.Indicator
-        className="h-full w-full flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 transition-all"
-        style={{ transform: `translateX(-${100 - normalizedValue}%)` }}
-      />
-    </ProgressPrimitive.Root>
-  );
-});
+>(({ className, value, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      'relative h-2 w-full overflow-hidden rounded-full bg-primary/20',
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className="h-full w-full flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 transition-all"
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+));
 
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
