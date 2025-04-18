@@ -3,6 +3,9 @@ const nextConfig = {
   // Enable React strict mode
   reactStrictMode: true,
   
+  // Target serverless environment
+  target: 'serverless',
+  
   // Configure images
   images: {
     domains: ['res.cloudinary.com'],
@@ -13,15 +16,13 @@ const nextConfig = {
     serverActions: true,
   },
   
-  // Handle optional dependencies
+  // Handle optional dependencies (keeping only necessary ones)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        bufferutil: false,
+        // Keep only essential fallbacks
+        'bufferutil': false,
         'utf-8-validate': false,
       };
     }

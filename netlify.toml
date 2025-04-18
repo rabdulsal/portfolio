@@ -4,9 +4,7 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NEXT_PUBLIC_SUPABASE_URL = "your-supabase-url"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
-  SUPABASE_SERVICE_ROLE_KEY = "your-service-role-key"
+  NODE_VERSION = "18"
 
 [functions]
   included_files = ["node_modules/**/*"]
@@ -30,7 +28,15 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Redirects
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
-  status = 200 
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/nextServer"
+  status = 200
+  force = false
+  conditions = {Role = ["admin"]} 
