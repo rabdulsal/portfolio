@@ -1,35 +1,54 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Bricolage_Grotesque, DM_Mono, Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import Script from 'next/script';
 
-const inter = Inter({ subsets: ['latin'] });
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['400', '500', '600', '700', '800'],
+});
+
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['300', '400', '500'],
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const iconUrl = `https://res.cloudinary.com/${cloudName}/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png`;
 
 export const metadata: Metadata = {
-  title: 'Rashad Abdul-Salaam | Web & Mobile Engineer',
-  description: 'Web and mobile engineer helping businesses grow with AI and automation.',
-  icons: {
-    icon: iconUrl,
-    shortcut: iconUrl,
-    apple: iconUrl,
+  title: 'Rashad Salaam — Staff iOS Engineer + AI Automation',
+  description:
+    'Penn Medicine CIO 100 Award recipient. Published researcher. 10+ years shipping enterprise iOS. Salaam Solutions LLC.',
+  icons: { icon: iconUrl, shortcut: iconUrl, apple: iconUrl },
+  openGraph: {
+    title: 'Rashad Salaam — Staff iOS Engineer + AI Automation',
+    description:
+      'Penn Medicine CIO 100 Award recipient. Published researcher. 10+ years shipping enterprise iOS.',
+    type: 'website',
+    url: 'https://www.rashadsalaam.com',
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      
-      <body className={inter.className}>
-        
+    <html
+      lang="en"
+      className="dark"
+      suppressHydrationWarning
+      style={{ colorScheme: 'dark' }}
+    >
+      <body
+        className={`${bricolage.variable} ${dmMono.variable} ${inter.variable} font-sans`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -40,15 +59,6 @@ export default function RootLayout({
           <Toaster />
         </ThemeProvider>
 
-        {/* Botpress Webchat */}
-        <Script 
-          src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"
-          strategy="lazyOnload"
-        />
-        <Script 
-          src="https://files.bpcontent.cloud/2025/03/09/22/20250309224320-1WWO1AQF.js"
-          strategy="lazyOnload"
-        />
       </body>
     </html>
   );

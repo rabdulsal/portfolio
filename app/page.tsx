@@ -1,484 +1,529 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Github, Linkedin, Mail, Terminal, Phone, X } from "lucide-react";
-import { useInView } from "react-intersection-observer";
-import { startAssistant, stopAssistant } from "@/components/ai";
-import { vapi } from "@/components/ai";
-import ActiveCallDetails from "@/components/custom/ActiveCallDetails";
-import ProjectCarousel from "@/components/custom/ProjectCarousel";
-import { projectOperations, type Project } from "@/lib/supabase";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { staticProjects } from '@/lib/staticProjects';
-import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Github, Linkedin, Mail, ExternalLink, ArrowDown } from "lucide-react";
+
+import CredentialStrip from "@/components/custom/CredentialStrip";
+import StatCounter from "@/components/custom/StatCounter";
+import BentoWork from "@/components/custom/BentoWork";
+import PublicationCard from "@/components/custom/PublicationCard";
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const PROJECTS = [
+  {
+    name: "FaceRater AI",
+    description:
+      "On-device facial recognition iOS app. TensorFlow/PyTorch model training, CoreML + Vision Framework for in-app inference, SwiftUI frontend.",
+    tags: ["Swift", "SwiftUI", "CoreML", "TensorFlow", "PyTorch"],
+    url: "https://github.com/stars/rabdulsal/lists/facerater-ai-codebases",
+    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744663749/iy0tgyekxtfjqhnkq8v6.webp",
+    highlight: true,
+  },
+  {
+    name: "Desk Agent",
+    description:
+      "AI-powered customer communications SaaS — voice scheduling, chatbots, automated SMS. Built for SMBs.",
+    tags: ["React", "TypeScript", "Node.js", "AI", "Twilio"],
+    url: "https://desk-agent.replit.app/",
+    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744605477/klayb3zblpj2fboim0hm.jpg",
+    highlight: false,
+  },
+  {
+    name: "GoTrotter",
+    description:
+      "Intelligent travel planner. AI-generated daily itineraries based on budget and preferences. Stripe, Google Maps, full-stack.",
+    tags: ["React", "TypeScript", "Express", "Stripe", "Google Maps"],
+    url: "https://gotrotter.replit.app",
+    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744678786/av1h1l8ngva7veowqibb.jpg",
+    highlight: false,
+  },
+];
+
+const SKILLS: { domain: string; items: string[] }[] = [
+  {
+    domain: "iOS / Mobile",
+    items: ["Swift", "SwiftUI", "UIKit", "WatchKit", "Xcode", "CoreData", "NFC"],
+  },
+  {
+    domain: "AI / Machine Learning",
+    items: ["CoreML", "TensorFlow", "PyTorch", "Vision", "OpenAI", "Claude / Anthropic"],
+  },
+  {
+    domain: "Automation / DevOps",
+    items: ["Fastlane", "Azure DevOps", "Power Automate", "GitHub Actions", "Python"],
+  },
+  {
+    domain: "Web / Full-Stack",
+    items: ["React", "TypeScript", "Node.js", "Next.js", "PostgreSQL", "Supabase"],
+  },
+];
+
+// ── Section label component ───────────────────────────────────────────────────
+
+function SectionLabel({ number, label }: { number: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-10">
+      <span className="font-mono text-xs text-orange tracking-widest">{number}</span>
+      <span className="h-px w-8 bg-orange/40" />
+      <span className="font-mono text-xs text-muted-foreground tracking-widest uppercase">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [heroRef, heroInView] = useInView({ triggerOnce: true });
-  const [projectsRef, projectsInView] = useInView({ triggerOnce: true });
-  const [aboutRef, aboutInView] = useInView({ triggerOnce: true });
-  const [contactRef, contactInView] = useInView({ triggerOnce: true });
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  /* Refactor to ContactForm Component */
-  const allFieldsFilled = firstName && lastName && email && phone;
-  
-  // VAPI Configs
-  const [callStarted, setCallStarted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [assistantIsSpeaking, setAssistantIsSpeaking] = useState(false);
-  const [volumeLevel, setVolumeLevel] = useState(0);
-  const [callId, setCallId] = useState("");
-  const [callResult, setCallResult] = useState(null);
-  const [loadingResult, setLoadingResult] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loadingProjects, setLoadingProjects] = useState(true);
-  const [showQuickForm, setShowQuickForm] = useState(false);
-  const [quickFormName, setQuickFormName] = useState("");
-  const [quickFormEmail, setQuickFormEmail] = useState("");
-  const [quickFormMessage, setQuickFormMessage] = useState("");
-  
+  // Scroll-based nav opacity
+  const { scrollY } = useScroll();
+  const navBg = useTransform(scrollY, [0, 80], ["rgba(10,15,30,0)", "rgba(10,15,30,0.95)"] as string[]);
 
-  useEffect(() => {
-    vapi.on("call-start", () => {
-      setCallStarted(true);
-      setLoading(false);
-    }).on("call-end", () => {
-      setCallStarted(false);
-      setLoading(false);
-    }).on("speech-start", () => {
-      setAssistantIsSpeaking(true);
-    }).on("speech-end", () => {
-      setAssistantIsSpeaking(false);
-    }).on("speech-end", () => {
-      setAssistantIsSpeaking(false);
-    }).on("volume-level", (volume) => {
-      setVolumeLevel(volume);
-    })
-  }, []);
-
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     try {
-  //       const data = await projectOperations.getProjects();
-  //       console.log(data);
-  //       setProjects(data);
-  //     } catch (error) {
-  //       console.error('Error fetching projects:', error);
-  //     } finally {
-  //       setLoadingProjects(false);
-  //     }
-  //   };
-
-  //   fetchProjects();
-  // }, []);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // console.log(firstName, lastName, email, phone);
-  };
-
-  const handleStart = async () => {
-    setLoading(true);
-    const data = await startAssistant(firstName, lastName, email, phone);
-    setCallId(data.id);
-    setLoading(false);
-  };
-
-  const handleStop = async () => {
-    stopAssistant();
-  };
-
-  const handleQuickFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    setShowQuickForm(false);
-    setQuickFormName("");
-    setQuickFormEmail("");
-    setQuickFormMessage("");
-  };
-    
   return (
-    <main className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-sm z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <Image 
-              src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/qy3rpcppyfp6cs4nwv52.png"
-              alt="Logo"
-              width={32}
-              height={32}
-              className="rounded-sm"
-            />
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" asChild>
-                <a href="#about">About</a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
 
-      {/* Hero Section with Deep Purple Gradient and Grid Effect */}
-      <section
-        ref={heroRef}
-        className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-        style={{
-          background: "linear-gradient(to bottom, #1a0b2e, #121212)",
-        }}
+      {/* ── Fixed Nav ─────────────────────────────────────────────────── */}
+      <motion.nav
+        style={{ backgroundColor: navBg as any }}
+        className="fixed top-0 inset-x-0 z-50 backdrop-blur-sm border-b border-white/5"
       >
-        {/* Grid Pattern Overlay */}
-        <div 
-          className="absolute inset-0 z-0 opacity-20"
-          style={{
-            backgroundImage: "linear-gradient(#8a2be2 1px, transparent 1px), linear-gradient(90deg, #8a2be2 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-            backgroundPosition: "center center",
-          }}
-        />
-        
-        {/* Abstract Glow Effects */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-600/20 blur-[100px] z-0"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-indigo-500/20 blur-[120px] z-0"></div>
-        <div className="absolute top-1/2 right-1/3 w-72 h-72 rounded-full bg-blue-500/10 blur-[80px] z-0"></div>
-        
-        {/* Gradient Fade to Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10"></div>
-        
-        {/* Hero Content */}
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-center gap-0 z-20 -mt-16">
-          <motion.div
-            initial={{ opacity: 0, x: 0, y: 20 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative order-1 lg:order-2 mb-8 lg:mb-0 lg:pl-4"
-          >
-            {/* Image Container with Glow Effect */}
-            <div className="relative flex justify-center">
-              {/* Outer Glow */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
-              {/* Image */}
-              <div className="relative overflow-hidden rounded-full border-4 border-purple-500/20">
-                <img
-                  src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
-                  alt="Rashad Abdul-Salaam"
-                  className="w-40 h-40 sm:w-56 sm:h-56 lg:w-[350px] lg:h-[350px] object-cover"
-                />
-              </div>
-              {/* Inner Glow */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-transparent"></div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-center lg:text-left space-y-6 max-w-xl lg:pr-4 order-2 lg:order-1"
-          >
-            <h1 className="text-4xl sm:text-6xl font-bold">
-              Hi, I'm <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-300">Rashad</span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-muted-foreground">
-              Web and mobile engineer helping businesses grow with AI and automation.
-            </p>
-            <div className="flex justify-center lg:justify-start gap-4">
-              <Button
-                asChild
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <img
+            src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png"
+            alt="Rashad Salaam"
+            width={34}
+            height={34}
+            className="rounded-full block"
+          />
+          <div className="hidden md:flex items-center gap-8">
+            {["Work", "Research", "Projects", "Skills", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="font-mono text-xs text-muted-foreground hover:text-white transition-colors tracking-widest uppercase"
               >
-                <a href="#projects">View Projects</a>
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowQuickForm(true)}
-                className="backdrop-blur-sm bg-background/10 border-purple-500/30 hover:bg-background/20"
-              >
-                Get in Touch
-              </Button>
-            </div>
-          </motion.div>
+                {item}
+              </a>
+            ))}
+          </div>
+          <a
+            href="https://www.linkedin.com/in/rashadabdulsalaam/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-orange hover:text-orange/80 transition-colors tracking-widest uppercase"
+          >
+            LinkedIn ↗
+          </a>
         </div>
+      </motion.nav>
 
-        {/* Remove the CTA and Form section */}
-        {showQuickForm && (
-          <div className="container mx-auto px-4 z-20 mt-12">
-            <div className="max-w-[500px] mx-auto">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="relative"
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex flex-col overflow-hidden bg-background">
+        <div className="grain-overlay" />
+        <div className="dot-grid" />
+
+        {/* Glow orb behind photo */}
+        <div className="absolute top-1/3 right-[5%] w-[500px] h-[500px] rounded-full bg-orange/[0.04] blur-[120px] pointer-events-none z-0" />
+
+        <div className="relative z-10 flex-1 flex items-end max-w-6xl mx-auto w-full px-6 pb-16 pt-32">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-8 items-end">
+
+            {/* Left: name + sub */}
+            <div className="lg:col-span-3 flex flex-col gap-5">
+              {/* Section label */}
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] tracking-widest text-muted-foreground">
+                  PORTFOLIO 2025
+                </span>
+              </div>
+
+              {/* Oversized name */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="font-display font-extrabold leading-[0.9] tracking-tighter text-white"
+                style={{ fontSize: "clamp(64px, 11vw, 152px)" }}
               >
-                <div className="bg-background/20 backdrop-blur-sm p-6 rounded-xl border border-purple-500/20">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setShowQuickForm(false)}
-                    className="absolute -right-2 -top-2 h-8 w-8 rounded-full bg-background/50 hover:bg-background/70 border border-purple-500/20"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                  <form onSubmit={handleQuickFormSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label htmlFor="quick-name" className="block text-sm font-medium">
-                          Name
-                        </label>
-                        <Input
-                          id="quick-name"
-                          value={quickFormName}
-                          onChange={(e) => setQuickFormName(e.target.value)}
-                          placeholder="Your name"
-                          className="bg-background/50 border-purple-500/30 focus:border-purple-500/50"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label htmlFor="quick-email" className="block text-sm font-medium">
-                          Email
-                        </label>
-                        <Input
-                          id="quick-email"
-                          type="email"
-                          value={quickFormEmail}
-                          onChange={(e) => setQuickFormEmail(e.target.value)}
-                          placeholder="your@email.com"
-                          className="bg-background/50 border-purple-500/30 focus:border-purple-500/50"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="quick-message" className="block text-sm font-medium">
-                        Business Need (Optional)
-                      </label>
-                      <Textarea
-                        id="quick-message"
-                        value={quickFormMessage}
-                        onChange={(e) => setQuickFormMessage(e.target.value)}
-                        placeholder="Tell us about your business automation needs..."
-                        className="bg-background/50 border-purple-500/30 focus:border-purple-500/50 min-h-[100px]"
-                      />
-                    </div>
-                    <Button 
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
-                    >
-                      Let's Connect
-                    </Button>
-                  </form>
-                </div>
+                RASHAD
+                <br />
+                SALAAM
+              </motion.h1>
+
+              {/* Subtitle bar */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="flex items-center gap-3"
+              >
+                <span className="h-px w-6 bg-orange" />
+                <span className="font-mono text-xs text-orange tracking-[0.2em] uppercase">
+                  Staff iOS Engineer + AI Automation
+                </span>
+              </motion.div>
+
+              {/* One-liner */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="text-muted-foreground text-base max-w-md leading-relaxed"
+              >
+                10 years building enterprise iOS at scale. CIO 100 Award winner.
+                Published AI researcher. Founder at{" "}
+                <span className="text-white">Salaam Solutions LLC</span>.
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.65 }}
+                className="flex flex-wrap items-center gap-3 pt-2"
+              >
+                <a
+                  href="#work"
+                  className="inline-flex items-center gap-2 bg-orange text-background font-mono text-xs font-bold px-5 py-2.5 rounded-lg tracking-wide hover:bg-orange/90 transition-colors"
+                >
+                  View My Work
+                </a>
+                <a
+                  href="mailto:rabdulsalaam@gmail.com"
+                  className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-5 py-2.5 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Get in Touch
+                </a>
               </motion.div>
             </div>
-          </div>
-        )}
-      </section>
 
-      {/* Projects Section */}
-      <section
-        id="projects"
-        ref={projectsRef}
-        className="py-20 px-4 sm:px-6 lg:px-8"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={projectsInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="max-w-7xl mx-auto"
-        >
-          <h2 className="text-3xl font-bold mb-12 text-center">Featured Projects</h2>
-          {/* {loadingProjects ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          ) : projects.length > 0 ? (
-            <ProjectCarousel projects={projects} />
-          ) : (
-            <div className="text-center text-muted-foreground">
-              No projects available yet.
-            </div>
-          )} */}
-          <ProjectCarousel projects={staticProjects} />
-        </motion.div>
-      </section>
-
-      {/* About Section */}
-      <section
-        id="about"
-        ref={aboutRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/50"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={aboutInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mx-auto text-center"
-        >
-          <h2 className="text-3xl font-bold mb-8">About Me</h2>
-          <p className="text-lg text-muted-foreground mb-6">
-            I've been developing innovative, impactful, enterprise-grade iOS applications for the last decade, and I'm adding AI-automation / engineering to my toolbelt. I'm building cross-platform AI/ML-powered applications to help people and businesses reach the next level. Let's make your dreams a reality! 🚀 💫 
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button variant="outline" asChild>
-              <a href="#" target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-4 w-4" />
-                GitHub
-              </a>
-            </Button>
-            <Button variant="outline" asChild>
-              <a href="https://www.linkedin.com/in/rashadabdulsalaam/" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="mr-2 h-4 w-4" />
-                LinkedIn
-              </a>
-            </Button>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Contact Section */}
-      <section
-        id="contact"
-        ref={contactRef}
-        className="py-20 px-4 sm:px-6 lg:px-8"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={contactInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mx-auto text-center"
-        >
-          <h2 className="text-3xl font-bold mb-8">Get in Touch</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Email me with your inquiry, or chat now with my AI assistant to schedule a consultation.
-          </p>
-          <div className="flex justify-center gap-6">
-            <Button size="lg" asChild>
-              <a href="mailto:rabdulsalaam@gmail.com">
-                <Mail className="mr-2 h-5 w-5" />
-                Email Me
-              </a>
-            </Button>
-            {/* <Button size="lg" variant="outline" asChild>
-              <a href="https://www.linkedin.com/in/rashadabdulsalaam/" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="mr-2 h-5 w-5" />
-                Connect
-              </a>
-            </Button> */}
-            <Button 
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 text-white"
-              size="lg"
-              // onClick={() => !showContactForm && !callStarted && !loading && !loadingResult && !callResult ? setShowContactForm(true) : setShowContactForm(false)}
-              onClick={handleStart}
-              disabled={loading || loadingResult || callStarted}
+            {/* Right: photo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-2 flex justify-center lg:justify-end"
             >
-              <Phone className="mr-2 h-5 w-5" />
-              AI Inquiry Call
-            </Button>
+              <div className="relative">
+                {/* Orange top line */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange z-10" />
+                {/* Photo */}
+                <div className="w-[260px] lg:w-[320px] aspect-[3/4] overflow-hidden relative bg-[hsl(var(--surface))]">
+                  <img
+                    src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744694549/t5qicy62lx8uah5ky0zc.png"
+                    alt="Rashad Salaam"
+                    className="w-full h-full object-cover object-top"
+                  />
+                  {/* Subtle vignette */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent pointer-events-none" />
+                </div>
+                {/* Social links beside photo */}
+                <div className="absolute -right-10 top-1/2 -translate-y-1/2 flex flex-col gap-4 hidden lg:flex">
+                  {[
+                    { icon: Github,   href: "https://github.com/rabdulsal",                  label: "GitHub"   },
+                    { icon: Linkedin, href: "https://www.linkedin.com/in/rashadabdulsalaam/", label: "LinkedIn" },
+                    { icon: Mail,     href: "mailto:rabdulsalaam@gmail.com",                  label: "Email"    },
+                  ].map(({ icon: Icon, href, label }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
           </div>
-          {/* Contact Form */}
-          { showContactForm && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <br />
-            <h3 className="text-lg font-semibold">Leave some details and chat with an agent!</h3>
-            
-            {/* Names row */}
-            <div className="flex gap-4">
-              <div className="flex-1 space-y-2">
-                <label htmlFor="firstName" className="block text-sm font-medium text-left">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div className="flex-1 space-y-2">
-                <label htmlFor="lastName" className="block text-sm font-medium text-left">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
+        </div>
 
-            {/* Email and Phone row */}
-            <div className="flex gap-4">
-              <div className="flex-1 space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-left">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div className="flex-1 space-y-2">
-                <label htmlFor="phone" className="block text-sm font-medium text-left">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-
-            {!callStarted && (
-              <Button 
-                onClick={handleStart} 
-                type="submit" 
-                className="w-full"
-                disabled={!allFieldsFilled}
-              >
-                Start Inquiry Call
-              </Button>
-            )}
-          </form>
-          )}
-          {(loading || loadingResult) && (
-            <div className="loading"></div>
-          )}
-          {callStarted && (
-            <ActiveCallDetails 
-            isSpeaking={assistantIsSpeaking} 
-            volume={volumeLevel} 
-            endCallCallback={handleStop}
-            />
-          )}
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="relative z-10 flex justify-center pb-8"
+        >
+          <a href="#credentials" className="flex flex-col items-center gap-1 text-muted-foreground hover:text-white transition-colors">
+            <ArrowDown className="w-4 h-4 animate-bounce" />
+          </a>
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-muted-foreground">
-          <p>© {new Date().getFullYear()} Rashad. All rights reserved.</p>
+      {/* ── Credential Strip ──────────────────────────────────────────── */}
+      <div id="credentials">
+        <CredentialStrip />
+      </div>
+
+      {/* ── Stats ─────────────────────────────────────────────────────── */}
+      <section className="py-20 border-b border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-0 md:divide-x md:divide-[hsl(var(--border-subtle))]">
+            {[
+              { value: "10+", label: "Years iOS",     sublabel: "Enterprise + Mobile" },
+              { value: "3",   label: "Platforms",     sublabel: "Built at scale" },
+              { value: "1",   label: "Award",         sublabel: "Penn Medicine CIO 100" },
+              { value: "1",   label: "Publication",   sublabel: "JCO · Peer-reviewed" },
+            ].map((s) => (
+              <div key={s.label} className="md:px-10 first:pl-0 last:pr-0">
+                <StatCounter value={s.value} label={s.label} sublabel={s.sublabel} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Work ──────────────────────────────────────────────────────── */}
+      <section id="work" className="py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel number="01" label="Work" />
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-3 leading-tight">
+              Where I've
+              <br />
+              <span className="text-orange">built.</span>
+            </h2>
+            <p className="text-muted-foreground mb-10 max-w-lg">
+              Enterprise-scale iOS across healthcare, logistics, finance — and founding a SaaS company on the side.
+            </p>
+          </motion.div>
+          <BentoWork />
+        </div>
+      </section>
+
+      {/* ── Research ──────────────────────────────────────────────────── */}
+      <section id="research" className="py-24 border-t border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel number="02" label="Research" />
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-3 leading-tight">
+              Published
+              <br />
+              <span className="text-orange">researcher.</span>
+            </h2>
+            <p className="text-muted-foreground mb-10 max-w-lg">
+              Co-authored peer-reviewed research at the intersection of mobile engineering and clinical AI.
+            </p>
+          </motion.div>
+          <PublicationCard />
+        </div>
+      </section>
+
+      {/* ── Projects ──────────────────────────────────────────────────── */}
+      <section id="projects" className="py-24 border-t border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel number="03" label="Projects" />
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-3 leading-tight">
+              Selected
+              <br />
+              <span className="text-orange">work.</span>
+            </h2>
+            <p className="text-muted-foreground mb-10 max-w-lg">
+              From on-device AI to full-stack SaaS — products that ship and run in production.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {PROJECTS.map((project, i) => (
+              <motion.a
+                key={project.name}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bento-card group block bg-[hsl(var(--surface))] rounded-xl overflow-hidden"
+              >
+                {/* Image */}
+                <div className="aspect-[16/9] overflow-hidden relative">
+                  <img
+                    src={project.image}
+                    alt={project.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {project.highlight && (
+                    <div className="absolute top-3 left-3 bg-orange text-background font-mono text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">
+                      Featured
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-display font-bold text-lg text-white">{project.name}</h3>
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-[hsl(var(--surface-2))] text-muted-foreground border border-[hsl(var(--border-subtle))] tracking-wide"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Skills ────────────────────────────────────────────────────── */}
+      <section id="skills" className="py-24 border-t border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel number="04" label="Skills" />
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-10 leading-tight">
+              The stack.
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {SKILLS.map((domain, i) => (
+              <motion.div
+                key={domain.domain}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.07 }}
+                className="bento-card bg-[hsl(var(--surface))] rounded-xl p-5"
+              >
+                <div className="font-mono text-[10px] text-orange tracking-widest uppercase mb-4">
+                  {domain.domain}
+                </div>
+                <ul className="space-y-2">
+                  {domain.items.map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="w-1 h-1 rounded-full bg-orange/50 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contact ───────────────────────────────────────────────────── */}
+      <section id="contact" className="py-24 border-t border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel number="05" label="Contact" />
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-3 leading-tight">
+              Let's talk.
+            </h2>
+            <p className="text-muted-foreground mb-10 max-w-md">
+              Open to Staff iOS, Principal, and VP Mobile Engineering roles. Reach out directly.
+            </p>
+          </motion.div>
+
+          <div className="flex flex-wrap gap-4 items-center mb-8">
+            <a
+              href="mailto:rabdulsalaam@gmail.com"
+              className="inline-flex items-center gap-2 bg-orange text-background font-mono text-xs font-bold px-6 py-3 rounded-lg tracking-wide hover:bg-orange/90 transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              rabdulsalaam@gmail.com
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/rashadabdulsalaam/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-6 py-3 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
+            >
+              <Linkedin className="w-3.5 h-3.5" />
+              LinkedIn
+            </a>
+
+            <a
+              href="https://github.com/rabdulsal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-6 py-3 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
+            >
+              <Github className="w-3.5 h-3.5" />
+              GitHub
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────────────────────── */}
+      <footer className="border-t border-[hsl(var(--border-subtle))] py-8">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <img
+            src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png"
+            alt="Rashad Salaam"
+            width={30}
+            height={30}
+            className="rounded-full block"
+          />
+          <span className="font-mono text-[10px] text-muted-foreground tracking-widest">
+            © {new Date().getFullYear()} Salaam Solutions LLC · All rights reserved
+          </span>
+          <div className="flex items-center gap-6">
+            {[
+              { label: "GitHub",   href: "https://github.com/rabdulsal" },
+              { label: "LinkedIn", href: "https://www.linkedin.com/in/rashadabdulsalaam/" },
+              { label: "Email",    href: "mailto:rabdulsalaam@gmail.com" },
+            ].map(({ label, href }) => (
+              <a
+                key={label}
+                href={href}
+                target={label !== "Email" ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="font-mono text-[10px] text-muted-foreground hover:text-white transition-colors tracking-widest uppercase"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
+
     </main>
   );
 }
