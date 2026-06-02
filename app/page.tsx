@@ -12,30 +12,30 @@ import PublicationCard from "@/components/custom/PublicationCard";
 
 const PROJECTS = [
   {
-    name: "FaceRater AI",
+    name: "BossMan",
     description:
-      "On-device facial recognition iOS app. TensorFlow/PyTorch model training, CoreML + Vision Framework for in-app inference, SwiftUI frontend.",
-    tags: ["Swift", "SwiftUI", "CoreML", "TensorFlow", "PyTorch"],
-    url: "https://github.com/stars/rabdulsal/lists/facerater-ai-codebases",
-    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744663749/iy0tgyekxtfjqhnkq8v6.webp",
+      "Field service CRM for home contractors — job dispatch, invoicing, AI receptionist, and Stripe billing. $99–$349/mo SaaS serving HVAC, plumbing, and electrical trades.",
+    tags: ["React", "TypeScript", "Fastify", "PostgreSQL", "Stripe", "Drizzle"],
+    url: "https://getbossman.com",
+    image: "/screenshots/bossman.png",
     highlight: true,
+  },
+  {
+    name: "Relay",
+    description:
+      "Shared task board for AI agents — MCP-native REST API, Mac menu bar client, and real-time task visibility across agent sessions. No SDK required.",
+    tags: ["TypeScript", "Fastify", "SQLite", "Swift", "SwiftUI", "MCP"],
+    url: "https://tryrelayapp.com",
+    image: "/screenshots/relay.png",
+    highlight: false,
   },
   {
     name: "Desk Agent",
     description:
-      "AI-powered customer communications SaaS — voice scheduling, chatbots, automated SMS. Built for SMBs.",
-    tags: ["React", "TypeScript", "Node.js", "AI", "Twilio"],
-    url: "https://desk-agent.replit.app/",
-    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744605477/klayb3zblpj2fboim0hm.jpg",
-    highlight: false,
-  },
-  {
-    name: "GoTrotter",
-    description:
-      "Intelligent travel planner. AI-generated daily itineraries based on budget and preferences. Stripe, Google Maps, full-stack.",
-    tags: ["React", "TypeScript", "Express", "Stripe", "Google Maps"],
-    url: "https://gotrotter.replit.app",
-    image: "https://res.cloudinary.com/djhqucpvr/image/upload/v1744678786/av1h1l8ngva7veowqibb.jpg",
+      "AI-powered customer communications platform — voice scheduling, chatbot intake, and automated SMS/email for SMBs. Built on Vapi.ai and Twilio.",
+    tags: ["React", "TypeScript", "Node.js", "Vapi.ai", "Twilio", "Supabase"],
+    url: "https://deskagent.co",
+    image: "/screenshots/deskagent.png",
     highlight: false,
   },
 ];
