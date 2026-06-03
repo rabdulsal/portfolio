@@ -1,12 +1,13 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Github, Linkedin, Mail, ExternalLink, ArrowDown } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowDown } from "lucide-react";
 
 import CredentialStrip from "@/components/custom/CredentialStrip";
 import StatCounter from "@/components/custom/StatCounter";
 import BentoWork from "@/components/custom/BentoWork";
 import PublicationCard from "@/components/custom/PublicationCard";
+import ProjectCarousel from "@/components/custom/ProjectCarousel";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -345,56 +346,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PROJECTS.map((project, i) => (
-              <motion.a
-                key={project.name}
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bento-card group block bg-[hsl(var(--surface))] rounded-xl overflow-hidden"
-              >
-                {/* Image */}
-                <div className="aspect-[16/9] overflow-hidden relative">
-                  <img
-                    src={project.image}
-                    alt={project.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {project.highlight && (
-                    <div className="absolute top-3 left-3 bg-orange text-background font-mono text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">
-                      Featured
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-display font-bold text-lg text-white">{project.name}</h3>
-                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-[hsl(var(--surface-2))] text-muted-foreground border border-[hsl(var(--border-subtle))] tracking-wide"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.a>
-            ))}
-          </div>
+          <ProjectCarousel projects={PROJECTS} />
         </div>
       </section>
 

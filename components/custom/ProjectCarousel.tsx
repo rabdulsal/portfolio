@@ -1,116 +1,156 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { type Project } from '@/lib/supabase';
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface ProjectCarouselProps {
-  projects: Project[];
+interface Project {
+  name: string;
+  description: string;
+  tags: string[];
+  url: string;
+  image: string;
+  highlight?: boolean;
 }
 
-export default function ProjectCarousel({ projects }: ProjectCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+const variants = {
+  enter: (d: number) => ({ x: d > 0 ? "100%" : "-100%", opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit:  (d: number) => ({ x: d > 0 ? "-100%" : "100%", opacity: 0 }),
+};
 
-  const nextProject = () => {
-    setDirection(1);
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % projects.length);
-  };
+export default function ProjectCarousel({ projects }: { projects: Project[] }) {
+  const [index, setIndex]   = useState(0);
+  const [dir, setDir]       = useState(1);
+  const [paused, setPaused] = useState(false);
 
-  const prevProject = () => {
-    setDirection(-1);
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + projects.length) % projects.length);
-  };
+  const go = useCallback((next: number) => {
+    setDir(next > index ? 1 : -1);
+    setIndex(next);
+  }, [index]);
 
-  // Auto-advance every 5 seconds
+  const prev = () => go((index - 1 + projects.length) % projects.length);
+  const next = () => go((index + 1) % projects.length);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      nextProject();
-    }, 10000);
+    if (paused) return;
+    const t = setInterval(() => {
+      setDir(1);
+      setIndex(i => (i + 1) % projects.length);
+    }, 5000);
+    return () => clearInterval(t);
+  }, [paused, projects.length]);
 
-    return () => clearInterval(timer);
-  }, []);
-
-  const currentProject = projects[currentIndex];
+  const p = projects[index];
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
-      {/* Subtle glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-2xl blur-xl" />
-      
-      <div className="relative bg-background/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="space-y-6"
+    <div
+      className="relative w-full rounded-xl overflow-hidden bento-card"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* ── Image slide ─────────────────────────────────────────── */}
+      <div className="relative aspect-[16/9] overflow-hidden bg-[hsl(var(--surface))]">
+        <AnimatePresence custom={dir} initial={false}>
+          <motion.a
+            key={index}
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            custom={dir}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.42, ease: [0.32, 0, 0.67, 0] }}
+            className="absolute inset-0 block group"
           >
-            <div className="aspect-video relative overflow-hidden rounded-lg">
-              <img
-                src={currentProject.image_url}
-                alt={currentProject.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div className="space-y-4">
-              <h3 className="text-2xl font-semibold">{currentProject.name}</h3>
-              <p className="text-muted-foreground">{currentProject.description}</p>
-              {currentProject.website_url && (
-                <a
-                  href={currentProject.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block text-sm text-primary hover:underline"
-                >
-                  Visit Project →
-                </a>
-              )}
-            </div>
-          </motion.div>
+            <img
+              src={p.image}
+              alt={p.name}
+              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+            />
+            {/* Bottom gradient for readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none" />
+
+            {/* Featured badge */}
+            {p.highlight && (
+              <div className="absolute top-4 left-4 bg-orange text-background font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-widest uppercase z-10">
+                Featured
+              </div>
+            )}
+          </motion.a>
         </AnimatePresence>
 
-        {/* Navigation buttons */}
-        {/* <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={prevProject}
-            className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={nextProject}
-            className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </Button>
-        </div> */}
+        {/* Prev arrow */}
+        <button
+          onClick={prev}
+          aria-label="Previous project"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-background/70 backdrop-blur-sm border border-white/10 text-white hover:bg-background/90 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
 
-        {/* Dots indicator -- Add back once 4+ projects are added*/}
-        {/* <div className="flex justify-center gap-2 mt-6">
-          {projects.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setDirection(index > currentIndex ? 1 : -1);
-                setCurrentIndex(index);
-              }}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? 'bg-primary' : 'bg-muted'
-              }`}
-            />
-          ))}
-        </div> */}
+        {/* Next arrow */}
+        <button
+          onClick={next}
+          aria-label="Next project"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-background/70 backdrop-blur-sm border border-white/10 text-white hover:bg-background/90 transition-colors"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* ── Project info ─────────────────────────────────────────── */}
+      <div className="bg-[hsl(var(--surface))] border-t border-[hsl(var(--border-subtle))] px-6 py-5">
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h3 className="font-display font-bold text-xl text-white leading-tight">
+            {p.name}
+          </h3>
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-orange hover:text-orange/80 transition-colors tracking-wide shrink-0 mt-1"
+          >
+            Visit ↗
+          </a>
+        </div>
+
+        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          {p.description}
+        </p>
+
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Tech tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {p.tags.map((t) => (
+              <span
+                key={t}
+                className="font-mono text-[10px] px-2 py-0.5 rounded bg-[hsl(var(--surface-2))] text-muted-foreground border border-[hsl(var(--border-subtle))] tracking-wide"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* Dot / pill indicators */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {projects.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => go(i)}
+                aria-label={`Go to project ${i + 1}`}
+                className={`rounded-full transition-all duration-300 ${
+                  i === index
+                    ? "w-5 h-1.5 bg-orange"
+                    : "w-1.5 h-1.5 bg-[hsl(var(--border-subtle))] hover:bg-muted-foreground"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
-} 
+}
