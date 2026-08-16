@@ -8,18 +8,37 @@ import StatCounter from "@/components/custom/StatCounter";
 import BentoWork from "@/components/custom/BentoWork";
 import PublicationCard from "@/components/custom/PublicationCard";
 import ProjectCarousel from "@/components/custom/ProjectCarousel";
+import PrepRallyShowcase from "@/components/custom/PrepRallyShowcase";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const PROJECTS = [
   {
+    name: "PrepRally",
+    description:
+      "AI interview-coaching app, live on the App Store — ask a real question out loud, answer out loud, and get graded on content, pace, filler words, and STAR structure, with a spoken summary. Built and shipped solo, end to end.",
+    tags: ["React Native", "Expo", "Deepgram", "Claude", "OpenAI", "Supabase"],
+    url: "https://apps.apple.com/us/app/preprally-interview-practice/id6789340716",
+    image: "/screenshots/preprally-banner.png",
+    highlight: true,
+  },
+  {
+    name: "appstore-release-mcp",
+    description:
+      "Open-source MCP server that lets AI agents run end-to-end App Store releases — uploading icons, filling privacy settings, and driving TestFlight submission. Published to npm and the official MCP Registry.",
+    tags: ["TypeScript", "MCP", "Node.js", "App Store Connect API", "npm"],
+    url: "https://github.com/rabdulsal/appstore-release-mcp",
+    image: "/screenshots/appstore-mcp-banner.png",
+    highlight: false,
+  },
+  {
     name: "BossMan",
     description:
-      "Field service CRM for home contractors — job dispatch, invoicing, AI receptionist, and Stripe billing. $99–$349/mo SaaS serving HVAC, plumbing, and electrical trades.",
+      "Field service CRM for home contractors — job dispatch, invoicing, AI receptionist, and Stripe billing. A Salaam Solutions LLC product serving HVAC, plumbing, and electrical trades.",
     tags: ["React", "TypeScript", "Fastify", "PostgreSQL", "Stripe", "Drizzle"],
     url: "https://getbossman.com",
     image: "/screenshots/bossman.png",
-    highlight: true,
+    highlight: false,
   },
   {
     name: "Relay",
@@ -345,6 +364,8 @@ export default function Home() {
               From on-device AI to full-stack SaaS — products that ship and run in production.
             </p>
           </motion.div>
+
+          <PrepRallyShowcase />
 
           <ProjectCarousel projects={PROJECTS} />
         </div>
