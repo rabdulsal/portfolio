@@ -6,9 +6,9 @@ seriesNumber: 1
 excerpt: "A tampered extension, a hijacked script, a $6.3B theft, and a kernel bug an AI turned into root. Three were old failures. One shows what AI changes. Here is what went wrong, why, and what to check on Monday."
 seoKeywords: "AI engineering security, supply chain attack AI tools, Cursor extension backdoor, Polymarket DebugBear, Binance hack 2026, Linux kernel TCP vulnerability Anthropic, agent guardrails, least privilege for AI agents"
 author: Rashad Salaam
-publishedAt:
+publishedAt: 2026-11-09
 readMinutes: 6
-status: draft
+status: published
 linkedinPostId: rashad-li-sec-week-001
 featuredImage: /blog/postmortem-001-newspaper.webp
 socialImage: /blog/postmortem-001-social.jpg
