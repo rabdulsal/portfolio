@@ -14,7 +14,8 @@ const buildConfig = {
     path.join(__dirname, 'upload-image.js'),
     path.join(__dirname, 'upload.js'),
     path.join(__dirname, 'presigned-url.js'),
-    path.join(__dirname, 'submit-form.js')
+    path.join(__dirname, 'submit-form.js'),
+    path.join(__dirname, 'test-email.js')
   ],
   bundle: true,
   minify: true,

@@ -7,8 +7,10 @@ import {
   SITE_URL, absoluteImage, formatDate, getAllPosts, getPost, postUrl,
 } from '@/lib/blog';
 
-// Only slugs that exist at build time are served; everything else is a 404.
-export const dynamicParams = false;
+// Production: only slugs that exist at build time are served; everything else is a 404.
+// Dev: slugs render on demand, so a newly staged draft previews without restarting the server.
+// Drafts still 404 in production — getPost() only sees published posts there.
+export const dynamicParams = process.env.NODE_ENV !== 'production';
 
 export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
