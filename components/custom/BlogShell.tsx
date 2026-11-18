@@ -29,7 +29,7 @@ export default function BlogShell({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
       <main>{children}</main>
-      <footer className="border-t border-[hsl(var(--border-subtle))] py-8 mt-24">
+      <footer className="relative z-10 border-t border-[hsl(var(--border-subtle))] py-8 mt-24">
         <div className="max-w-3xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="font-mono text-[10px] text-muted-foreground tracking-widest">
             © {new Date().getFullYear()} Salaam Solutions LLC · All rights reserved
