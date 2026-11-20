@@ -42,16 +42,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className="dark"
       suppressHydrationWarning
-      style={{ colorScheme: 'dark' }}
+      style={{ colorScheme: 'light' }}
     >
       <body
         className={`${bricolage.variable} ${dmMono.variable} ${inter.variable} font-sans`}
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >

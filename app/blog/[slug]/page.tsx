@@ -45,9 +45,35 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
+// Global closing footer for published posts. Blurbs rotate across posts:
+// the pick is a stable hash of the slug, so a given post always shows the
+// same blurb while the set as a whole rotates. Add a blurb here to extend
+// the rotation; there is one place to change the wording later.
+const FOOTER_CTAS = [
+  {
+    label: 'Free guide',
+    title: 'When customers ask AI who to hire',
+    body: 'AI search answers the question before your website gets a click. This short guide covers what changed, the four-step loop, and a weekly checklist to get picked.',
+    href: '/aeo',
+    linkText: 'Get the free guide →',
+  },
+  {
+    label: 'Fractional cybersecurity',
+    title: 'Someone whose job is to think about how systems fail',
+    body: 'If your business runs on systems like the ones in these posts, and you do not have someone whose job is to think about how they fail, I do that work on a fractional basis. Security reviews, incident readiness, and the boring controls that keep a bad day from becoming a bad quarter.',
+    href: '/book',
+    linkText: 'Book a call →',
+  },
+];
+
 export default function BlogPost({ params }: { params: { slug: string } }) {
   const post = getPost(params.slug);
   if (!post) notFound();
+
+  const cta =
+    FOOTER_CTAS[
+      [...post.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FOOTER_CTAS.length
+    ];
 
   const image = absoluteImage(post.featuredImage);
   const jsonLd = {
@@ -96,6 +122,33 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
         <div className="mt-10">
           <Markdown source={post.body} />
         </div>
+
+        {post.status === 'published' && (
+          <aside className="mt-14 mb-4 border-t border-white/10 pt-8">
+            <p className="font-mono text-[11px] tracking-widest uppercase text-orange">
+              {cta.label}
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-semibold text-white">
+              {cta.title}
+            </h2>
+            <p className="mt-3 leading-relaxed text-muted-foreground">{cta.body}</p>
+            {cta.href.startsWith('http') ? (
+              <a
+                href={cta.href}
+                className="mt-5 inline-block font-mono text-xs tracking-widest uppercase text-orange hover:text-white"
+              >
+                {cta.linkText}
+              </a>
+            ) : (
+              <Link
+                href={cta.href}
+                className="mt-5 inline-block font-mono text-xs tracking-widest uppercase text-orange hover:text-white"
+              >
+                {cta.linkText}
+              </Link>
+            )}
+          </aside>
+        )}
       </article>
 
       {/* "<" escaped so post text can never close the script tag */}

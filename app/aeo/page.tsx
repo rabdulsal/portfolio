@@ -41,16 +41,16 @@ const LOOP = [
 export default function AeoGuidePage() {
   return (
     <BlogShell>
-      {/* Fixed background: circles anchored left, darkened; only the content scrolls */}
+      {/* Fixed background: waves across the bottom and right, darkened; only the content scrolls */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/aeo-escher.jpg"
+          src="/images/aeo-waves.jpg"
           alt=""
-          className="absolute top-0 right-[-26rem] h-full w-auto max-w-none -scale-x-100 brightness-[0.55]"
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-background/35 to-background/20" />
-        <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.6)]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/50 to-background/30" />
+        <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.25)]" />
       </div>
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">

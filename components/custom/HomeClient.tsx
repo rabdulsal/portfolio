@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, ArrowDown } from "lucide-react";
 
 import CredentialStrip from "@/components/custom/CredentialStrip";
@@ -9,6 +9,7 @@ import BentoWork from "@/components/custom/BentoWork";
 import PublicationCard from "@/components/custom/PublicationCard";
 import ProjectCarousel from "@/components/custom/ProjectCarousel";
 import PrepRallyShowcase from "@/components/custom/PrepRallyShowcase";
+import SiteNav from "@/components/custom/SiteNav";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -107,62 +108,12 @@ export type LatestPost = {
 };
 
 export default function HomeClient({ latestPost }: { latestPost?: LatestPost | null }) {
-  // Scroll-based nav opacity
-  const { scrollY } = useScroll();
-  const navBg = useTransform(scrollY, [0, 80], ["rgba(10,15,30,0)", "rgba(10,15,30,0.95)"] as string[]);
 
   return (
     <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
 
       {/* ── Fixed Nav ─────────────────────────────────────────────────── */}
-      <motion.nav
-        style={{ backgroundColor: navBg as any }}
-        className="fixed top-0 inset-x-0 z-50 backdrop-blur-sm border-b border-white/5"
-      >
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <img
-            src="https://res.cloudinary.com/djhqucpvr/image/upload/v1744870439/qy3rpcppyfp6cs4nwv52.png"
-            alt="Rashad Salaam"
-            width={34}
-            height={34}
-            className="rounded-full block"
-          />
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { label: "Work", href: "#work" },
-              { label: "Research", href: "#research" },
-              { label: "Projects", href: "#projects" },
-              { label: "Skills", href: "#skills" },
-              { label: "Blog", href: "/blog/" },
-              { label: "Contact", href: "#contact" },
-            ].map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                className="font-mono text-xs text-muted-foreground hover:text-white transition-colors tracking-widest uppercase"
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-          <div className="flex items-center gap-6">
-            <a
-              href="/blog/"
-              className="md:hidden font-mono text-xs text-muted-foreground hover:text-white transition-colors tracking-widest uppercase"
-            >
-              Blog
-            </a>
-            <a
-              href="https://www.linkedin.com/in/rashadabdulsalaam/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-xs text-orange hover:text-orange/80 transition-colors tracking-widest uppercase"
-            >
-              LinkedIn ↗
-            </a>
-          </div>
-        </div>
-      </motion.nav>
+      <SiteNav variant="fixed" />
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col overflow-hidden bg-background">
@@ -517,37 +468,16 @@ export default function HomeClient({ latestPost }: { latestPost?: LatestPost | n
               Let's talk.
             </h2>
             <p className="text-muted-foreground mb-10 max-w-xl">
-              Shipping AI agents or a mobile app? I take on consulting and client projects, from agent guardrails and security hardening to production iOS. Reach out directly.
+              If your business runs on systems like the ones in these posts, and you do not have someone whose job is to think about how they fail, I do that work on a fractional basis. Security reviews, incident readiness, and the boring controls that keep a bad day from becoming a bad quarter.
             </p>
           </motion.div>
 
           <div className="flex flex-wrap gap-4 items-center mb-8">
             <a
-              href="mailto:rabdulsalaam@gmail.com"
+              href="/book"
               className="inline-flex items-center gap-2 bg-orange text-background font-mono text-xs font-bold px-6 py-3 rounded-lg tracking-wide hover:bg-orange/90 transition-colors"
             >
-              <Mail className="w-3.5 h-3.5" />
-              rabdulsalaam@gmail.com
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/rashadabdulsalaam/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-6 py-3 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
-            >
-              <Linkedin className="w-3.5 h-3.5" />
-              LinkedIn
-            </a>
-
-            <a
-              href="https://github.com/rabdulsal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-6 py-3 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
-            >
-              <Github className="w-3.5 h-3.5" />
-              GitHub
+              Book a call →
             </a>
           </div>
 

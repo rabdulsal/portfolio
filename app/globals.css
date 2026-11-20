@@ -4,7 +4,41 @@
 
 @layer base {
   :root {
-    /* Brand tokens */
+    /* Brand tokens — light theme (default). The gold is deepened from the
+       dark theme's 39 89% 71% to 36 80% 38% so it keeps contrast on white. */
+    --coal: 222 39% 10%;
+    --surface: 0 0% 100%;
+    --surface-2: 40 30% 95%;
+    --border-subtle: 36 22% 85%;
+    --orange: 36 80% 38%;
+    --orange-dim: 36 80% 38% / 0.1;
+    --text-muted: 220 13% 38%;
+
+    /* shadcn mappings */
+    --background: 40 33% 98%;
+    --foreground: 222 39% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 39% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 39% 10%;
+    --primary: 36 80% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 30% 95%;
+    --secondary-foreground: 222 39% 10%;
+    --muted: 40 30% 95%;
+    --muted-foreground: 220 13% 38%;
+    --accent: 40 30% 95%;
+    --accent-foreground: 222 39% 10%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 22% 85%;
+    --input: 36 22% 85%;
+    --ring: 36 80% 38%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Brand tokens — dark theme (the previous default, kept for the toggle) */
     --coal: 222 39% 6%;
     --surface: 220 28% 9%;
     --surface-2: 220 22% 12%;
@@ -45,7 +79,7 @@
   }
   ::selection {
     background: hsl(var(--orange) / 0.25);
-    color: #fff;
+    color: hsl(var(--foreground));
   }
 }
 
@@ -67,7 +101,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: radial-gradient(circle, hsl(220 20% 30% / 0.4) 1px, transparent 1px);
+  background-image: radial-gradient(circle, hsl(220 15% 45% / 0.28) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
 }
@@ -172,7 +206,7 @@
   transform: scale(1.2);
 }
 .speech-status {
-  color: #fff;
+  color: hsl(var(--foreground));
   font-weight: 700;
   font-size: 16px;
 }
@@ -200,3 +234,20 @@
   transition: background-color 0.3s ease;
 }
 .volume-bar.active { background-color: hsl(var(--orange)); }
+
+/* ── Light-theme remaps ───────────────────────────────────────
+   Much of the site was written dark-first with utility classes like
+   text-white, border-white/10 and bg-white/5. In light mode those are
+   remapped onto the light tokens so pages follow the theme without
+   editing every component. Dark mode keeps the original classes. */
+html.light .text-white { color: hsl(var(--foreground)) !important; }
+html.light .hover\:text-white:hover { color: hsl(var(--foreground)) !important; }
+html.light .text-background { color: hsl(var(--primary-foreground)) !important; }
+html.light .border-white\/5 { border-color: hsl(var(--border)) !important; }
+html.light .border-white\/10 { border-color: hsl(var(--border)) !important; }
+html.light .hover\:border-white\/30:hover { border-color: hsl(222 39% 10% / 0.3) !important; }
+html.light .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: hsl(var(--border)) !important; }
+html.light .bg-white\/5 { background-color: hsl(222 39% 10% / 0.04) !important; }
+html.light .bg-white\/10 { background-color: hsl(222 39% 10% / 0.07) !important; }
+html.light .shadow-black\/50 { --tw-shadow-color: hsl(222 39% 10% / 0.18) !important; }
+html.light .text-red-400 { color: hsl(0 62% 42%) !important; }
