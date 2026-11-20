@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Bricolage_Grotesque, DM_Mono, Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${bricolage.variable} ${dmMono.variable} ${inter.variable} font-sans`}
       >
+        <GoogleAnalytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
