@@ -72,7 +72,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
 
   const cta =
     FOOTER_CTAS[
-      [...post.slug].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FOOTER_CTAS.length
+      post.slug.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FOOTER_CTAS.length
     ];
 
   const image = absoluteImage(post.featuredImage);
