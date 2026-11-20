@@ -6,7 +6,7 @@
 const { sign } = require('./utils/guideToken');
 
 const FROM = 'Rashad Salaam <guide@rashadsalaam.com>';
-const REPLY_TO = 'rabdulsalaam@gmail.com';
+const REPLY_TO = 'rashad@getbossman.com';
 const SITE = 'https://rashadsalaam.com';
 
 exports.handler = async (event) => {

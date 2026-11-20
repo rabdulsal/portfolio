@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import BlogShell from "@/components/custom/BlogShell";
 
-// Rashad's Calendly: https://calendly.com/rashadsalaam
+// Rashad's Calendly advisory-hour event (created 2026-11-19).
 // One door: every engagement starts with the paid advisory hour.
-// This points at the Calendly profile today; swap it to the dedicated
-// advisory-hour event link when that event exists.
-const BOOKING_URL = "https://calendly.com/rashadsalaam";
+const BOOKING_URL = "https://calendly.com/rashadsalaam/advisory-hour";
 
 const LINKEDIN = "https://linkedin.com/in/rashadabdulsalaam";
 const ADVISORY_PRICE = "$99";

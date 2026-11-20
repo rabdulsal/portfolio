@@ -5,8 +5,8 @@
 const { verify } = require('./utils/guideToken');
 
 const FROM = 'Rashad Salaam <guide@rashadsalaam.com>';
-const REPLY_TO = 'rabdulsalaam@gmail.com';
-const NOTIFY = 'rabdulsalaam@gmail.com';
+const REPLY_TO = 'rashad@getbossman.com';
+const NOTIFY = 'rashad@getbossman.com';
 const SITE = 'https://rashadsalaam.com';
 const GUIDE_URL = `${SITE}/aeo-guide.pdf`;
 
@@ -52,7 +52,7 @@ exports.handler = async (event) => {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    return page('Something went wrong', `<h1 style="font-size:28px;">Something went wrong on my side.</h1><p>The mail setup is missing a piece. Email me at rabdulsalaam@gmail.com and I will send the guide by hand.</p>`);
+    return page('Something went wrong', `<h1 style="font-size:28px;">Something went wrong on my side.</h1><p>The mail setup is missing a piece. Email me at rashad@getbossman.com and I will send the guide by hand.</p>`);
   }
 
   const token = (event.queryStringParameters || {}).token;

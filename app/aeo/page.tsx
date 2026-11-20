@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BlogShell from "@/components/custom/BlogShell";
 import GuideSignupForm from "@/components/custom/GuideSignupForm";
+import AeoDemo from "@/components/custom/AeoDemo";
 
 export const metadata: Metadata = {
   title: "When Customers Ask AI — Free Guide | Rashad Salaam",
@@ -104,8 +105,22 @@ export default function AeoGuidePage() {
             </div>
           </div>
 
-          {/* Right: the form */}
+          {/* Right: live demo, then the guide form */}
           <div className="lg:sticky lg:top-24">
+            <div className="rounded-lg border border-orange/30 bg-background/85 backdrop-blur-md p-6 md:p-8 mb-6">
+              <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
+                Live demo
+              </p>
+              <h2 className="font-display text-2xl font-bold mb-2">
+                See what the AI says about you
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                Type your company name. A live AI answers the same question your next
+                customer asks it. You see the start of the answer here. The full answer
+                goes by email.
+              </p>
+              <AeoDemo />
+            </div>
             <div className="rounded-lg border border-white/10 bg-background/85 backdrop-blur-md p-6 md:p-8">
               <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
                 Free guide
