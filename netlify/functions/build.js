@@ -18,7 +18,8 @@ const buildConfig = {
     path.join(__dirname, 'test-email.js'),
     path.join(__dirname, 'guide-subscribe.js'),
     path.join(__dirname, 'guide-verify.js'),
-    path.join(__dirname, 'aeo-demo.js')
+    path.join(__dirname, 'aeo-demo.js'),
+    path.join(__dirname, 'intake.js')
   ],
   bundle: true,
   minify: true,
