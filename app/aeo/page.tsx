@@ -63,7 +63,7 @@ export default function AeoGuidePage() {
             <h1 className="font-display text-4xl md:text-5xl font-bold leading-tight mb-6">
               When customers ask AI, does it name your business?
             </h1>
-            <div className="space-y-4 text-muted-foreground leading-relaxed mb-10">
+            <div className="space-y-4 text-foreground/85 leading-relaxed mb-10 bg-background border border-white/10 rounded-lg p-6">
               <p>
                 Customers stopped scrolling ten blue links. They ask ChatGPT, Gemini, or
                 Google&apos;s AI Overview one question and take the answer it gives. If your
@@ -90,7 +90,7 @@ export default function AeoGuidePage() {
                 </div>
               ))}
             </div>
-            <div className="space-y-5">
+            <div className="space-y-5 bg-background border border-white/10 rounded-lg p-6">
               {LOOP.map((item) => (
                 <div key={item.step} className="flex gap-4">
                   <span className="font-mono text-xs text-orange tracking-widest pt-1">
@@ -98,7 +98,7 @@ export default function AeoGuidePage() {
                   </span>
                   <div>
                     <h3 className="font-display text-lg font-semibold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.body}</p>
+                    <p className="text-sm text-foreground/75 leading-relaxed">{item.body}</p>
                   </div>
                 </div>
               ))}
@@ -107,7 +107,8 @@ export default function AeoGuidePage() {
 
           {/* Right: live demo, then the guide form */}
           <div className="lg:sticky lg:top-24">
-            <div className="rounded-lg border border-orange/30 bg-background/85 backdrop-blur-md p-6 md:p-8 mb-6">
+            <div className="relative rounded-lg border border-orange/30 bg-background/95 backdrop-blur-md p-6 md:p-8 mb-6">
+              <span aria-hidden="true" className="beam-ring" />
               <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
                 Live demo
               </p>
@@ -121,7 +122,7 @@ export default function AeoGuidePage() {
               </p>
               <AeoDemo />
             </div>
-            <div className="rounded-lg border border-white/10 bg-background/85 backdrop-blur-md p-6 md:p-8">
+            <div className="rounded-lg border border-white/10 bg-background/95 backdrop-blur-md p-6 md:p-8">
               <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
                 Free guide
               </p>

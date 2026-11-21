@@ -251,3 +251,42 @@ html.light .bg-white\/5 { background-color: hsl(222 39% 10% / 0.04) !important; 
 html.light .bg-white\/10 { background-color: hsl(222 39% 10% / 0.07) !important; }
 html.light .shadow-black\/50 { --tw-shadow-color: hsl(222 39% 10% / 0.18) !important; }
 html.light .text-red-400 { color: hsl(0 62% 42%) !important; }
+
+/* ── Border beam ──────────────────────────────────────────────
+   A short segment of light travels a card's perimeter: across
+   the top, down the side, along the bottom, up the other side.
+   The ring is masked to the border only; a rotating conic wedge
+   inside it does the travelling. Used on the AEO live demo card. */
+.beam-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+.beam-ring::before {
+  content: '';
+  position: absolute;
+  inset: -120%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 292deg,
+    hsl(var(--orange) / 0.5) 320deg,
+    hsl(var(--orange)) 338deg,
+    #fff7ea 349deg,
+    transparent 360deg
+  );
+  animation: beam-travel 4.5s linear infinite;
+}
+@keyframes beam-travel {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beam-ring::before { animation: none; }
+}
