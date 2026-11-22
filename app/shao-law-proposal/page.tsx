@@ -96,11 +96,11 @@ export default function ShaoLawProposalPage() {
         </h1>
         <p className="mt-5 leading-relaxed text-muted-foreground">
           Jath, this is the whole engagement on one page, so you can see exactly
-          what you are paying for before we talk. Eight weeks, in two blocks. Two payments of
-          $500: the first buys weeks one to four, the second lands at week
-          four, so the full $1,000 is paid inside the first month. One meeting
-          a week. One measure that matters: one new client a week, on our way
-          to more.
+          what you are paying for before we talk. Eight weeks, in two blocks.
+          Two payments of $500: the first buys weeks one to four, the second
+          lands at week four, so the full amount is paid inside the first month.
+          One meeting a week. One measure that matters: one new client a week,
+          on our way to more.
         </p>
         <p className="mt-5 leading-relaxed text-muted-foreground">
           The work splits cleanly in two. Block One fixes the front door: how a
@@ -118,9 +118,16 @@ export default function ShaoLawProposalPage() {
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {BLOCK_ONE.map((item) => (
-              <div key={item.title} className="rounded-xl border border-white/10 p-5">
-                <h3 className="font-display text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              <div
+                key={item.title}
+                className="rounded-xl border border-white/10 p-5"
+              >
+                <h3 className="font-display text-lg font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
               </div>
             ))}
           </div>
@@ -129,7 +136,10 @@ export default function ShaoLawProposalPage() {
           </h3>
           <ul className="mt-4 space-y-3">
             {BEFORE_WE_START.map((line) => (
-              <li key={line} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
+              <li
+                key={line}
+                className="flex gap-3 text-sm leading-relaxed text-muted-foreground"
+              >
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange" />
                 <span>{line}</span>
               </li>
@@ -146,9 +156,16 @@ export default function ShaoLawProposalPage() {
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {BLOCK_TWO.map((item) => (
-              <div key={item.title} className="rounded-xl border border-white/10 p-5">
-                <h3 className="font-display text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              <div
+                key={item.title}
+                className="rounded-xl border border-white/10 p-5"
+              >
+                <h3 className="font-display text-lg font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
               </div>
             ))}
           </div>
@@ -166,16 +183,25 @@ export default function ShaoLawProposalPage() {
           </p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {NOT_INCLUDED.map((item) => (
-              <div key={item.title} className="rounded-xl border border-white/10 p-5">
-                <h3 className="font-display text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              <div
+                key={item.title}
+                className="rounded-xl border border-white/10 p-5"
+              >
+                <h3 className="font-display text-lg font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="mt-12 rounded-xl border border-white/10 p-6">
-          <h2 className="font-display text-2xl font-semibold text-white">The terms, plainly</h2>
+          <h2 className="font-display text-2xl font-semibold text-white">
+            The terms, plainly
+          </h2>
           <ul className="mt-4 space-y-3">
             {[
               "$1,000 total: $500 to start, $500 at week four. Eight weeks of work.",
@@ -184,7 +210,10 @@ export default function ShaoLawProposalPage() {
               "No automation ever gives legal advice. Anything legal gets flagged to you, and every client-facing automated message carries your approved wording.",
               "Success is counted in new clients per week, reported weekly, starting from a baseline we record together.",
             ].map((line) => (
-              <li key={line} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
+              <li
+                key={line}
+                className="flex gap-3 text-sm leading-relaxed text-muted-foreground"
+              >
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange" />
                 <span>{line}</span>
               </li>
