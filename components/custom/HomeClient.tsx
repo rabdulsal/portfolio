@@ -187,7 +187,7 @@ export default function HomeClient({ latestPost }: { latestPost?: LatestPost | n
                   View My Work
                 </a>
                 <a
-                  href="mailto:rashad@getbossman.com"
+                  href="mailto:rabdulsalaam@gmail.com"
                   className="inline-flex items-center gap-2 border border-[hsl(var(--border-subtle))] text-muted-foreground font-mono text-xs px-5 py-2.5 rounded-lg tracking-wide hover:border-white/30 hover:text-white transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5" />
@@ -221,12 +221,12 @@ export default function HomeClient({ latestPost }: { latestPost?: LatestPost | n
                   {[
                     { icon: Github,   href: "https://github.com/rabdulsal",                  label: "GitHub"   },
                     { icon: Linkedin, href: "https://www.linkedin.com/in/rashadabdulsalaam/", label: "LinkedIn" },
-                    { icon: Mail,     href: "mailto:rashad@getbossman.com",                  label: "Email"    },
+                    { icon: Mail,     href: "mailto:rabdulsalaam@gmail.com",                  label: "Email"    },
                   ].map(({ icon: Icon, href, label }) => (
                     <a
                       key={label}
                       href={href}
-                      target="_blank"
+                      target={href.startsWith("mailto:") ? undefined : "_blank"}
                       rel="noopener noreferrer"
                       aria-label={label}
                       className="text-muted-foreground hover:text-white transition-colors"
@@ -502,7 +502,7 @@ export default function HomeClient({ latestPost }: { latestPost?: LatestPost | n
               { label: "GitHub",   href: "https://github.com/rabdulsal" },
               { label: "LinkedIn", href: "https://www.linkedin.com/in/rashadabdulsalaam/" },
               { label: "Blog",     href: "/blog/" },
-              { label: "Email",    href: "mailto:rashad@getbossman.com" },
+              { label: "Email",    href: "mailto:rabdulsalaam@gmail.com" },
             ].map(({ label, href }) => (
               <a
                 key={label}

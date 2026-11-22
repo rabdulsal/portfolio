@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-
-const inputCls =
-  "w-full px-3 py-2.5 rounded-md bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-orange/60 focus:border-orange/60";
-const labelCls =
-  "block font-mono text-[11px] tracking-widest uppercase text-muted-foreground mb-1.5";
-const buttonCls =
-  "w-full py-3 rounded-md bg-orange text-white font-mono text-sm tracking-widest uppercase hover:bg-orange/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
-const linkBtnCls =
-  "mt-4 font-mono text-[11px] tracking-widest uppercase text-muted-foreground hover:text-orange transition-colors";
+import {
+  inputCls,
+  labelCls,
+  primaryBtnCls as buttonCls,
+  linkBtnCls,
+} from "@/components/custom/fields";
+import { Notice } from "@/components/custom/surfaces";
 
 type Phase = "idle" | "running" | "teaser" | "unlocking" | "sent";
 
@@ -91,31 +89,31 @@ export default function AeoDemo() {
 
   if (phase === "sent") {
     return (
-      <div className="rounded-lg border border-orange/30 bg-orange/5 p-5">
+      <Notice>
         <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
           Report sent
         </p>
         <p className="text-sm leading-relaxed">
-          The full answer is on its way to <span className="text-white">{email}</span>.
+          The full answer is on its way to <span className="font-semibold">{email}</span>.
           Read it word for word when it lands. What it leaves out is the story. The free
           guide is linked at the bottom of the same email.
         </p>
         <button type="button" onClick={reset} className={linkBtnCls}>
           Check another business
         </button>
-      </div>
+      </Notice>
     );
   }
 
   if (phase === "teaser" || phase === "unlocking") {
     return (
       <div>
-        <div className="rounded-lg border border-white/10 bg-white/5 p-5 mb-5">
+        <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-5 mb-5">
           <p className="font-mono text-[11px] text-orange tracking-widest uppercase mb-2">
             Perplexity · {askedOn}
           </p>
           <p className="text-sm leading-relaxed">{teaser}</p>
-          <p className="mt-3 border-t border-white/10 pt-3 text-sm font-medium">
+          <p className="mt-3 border-t border-foreground/10 pt-3 text-sm font-medium">
             {observation}
           </p>
         </div>

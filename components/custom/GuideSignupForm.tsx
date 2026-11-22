@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
-const inputCls =
-  "w-full px-3 py-2.5 rounded-md bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-orange/60 focus:border-orange/60";
-const labelCls =
-  "block font-mono text-[11px] tracking-widest uppercase text-muted-foreground mb-1.5";
+import { inputCls, labelCls, primaryBtnCls } from "@/components/custom/fields";
+import { Notice } from "@/components/custom/surfaces";
 
 export default function GuideSignupForm() {
   const [name, setName] = useState("");
@@ -40,16 +37,16 @@ export default function GuideSignupForm() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-lg border border-orange/30 bg-orange/5 p-5">
+      <Notice>
         <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
           One more step
         </p>
         <p className="text-sm leading-relaxed">
-          I sent a confirmation link to <span className="text-white">{email}</span>. Click it
+          I sent a confirmation link to <span className="font-semibold">{email}</span>. Click it
           and the guide lands in your inbox. If it is not in your main inbox, check Promotions
           or Spam and drag it over.
         </p>
-      </div>
+      </Notice>
     );
   }
 
@@ -130,7 +127,7 @@ export default function GuideSignupForm() {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="w-full py-3 rounded-md bg-orange text-white font-mono text-sm tracking-widest uppercase hover:bg-orange/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className={primaryBtnCls}
       >
         {status === "sending" ? "Sending..." : "Send me the guide"}
       </button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import BlogShell from "@/components/custom/BlogShell";
 import GuideSignupForm from "@/components/custom/GuideSignupForm";
 import AeoDemo from "@/components/custom/AeoDemo";
+import { WavesBackdrop, Panel, Card } from "@/components/custom/surfaces";
 
 export const metadata: Metadata = {
   title: "When Customers Ask AI — Free Guide | Rashad Salaam",
@@ -42,17 +43,7 @@ const LOOP = [
 export default function AeoGuidePage() {
   return (
     <BlogShell>
-      {/* Fixed background: waves across the bottom and right, darkened; only the content scrolls */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/aeo-waves.jpg"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/50 to-background/30" />
-        <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.25)]" />
-      </div>
+      <WavesBackdrop />
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left: summary, stats, loop */}
@@ -63,7 +54,7 @@ export default function AeoGuidePage() {
             <h1 className="font-display text-4xl md:text-5xl font-bold leading-tight mb-6">
               When customers ask AI, does it name your business?
             </h1>
-            <div className="space-y-4 text-foreground/85 leading-relaxed mb-10 bg-background border border-white/10 rounded-lg p-6">
+            <Panel className="mb-10 space-y-4 leading-relaxed text-foreground/85">
               <p>
                 Customers stopped scrolling ten blue links. They ask ChatGPT, Gemini, or
                 Google&apos;s AI Overview one question and take the answer it gives. If your
@@ -79,8 +70,8 @@ export default function AeoGuidePage() {
                 Two pages. Five minutes to read. Leave your name and email, confirm once, and
                 it lands in your inbox.
               </p>
-            </div>
-            <div className="grid grid-cols-2 gap-px bg-white/10 border border-white/10 rounded-lg overflow-hidden mb-10">
+            </Panel>
+            <div className="grid grid-cols-2 gap-px bg-foreground/10 border border-foreground/10 rounded-lg overflow-hidden mb-10">
               {STATS.map((s) => (
                 <div key={s.label} className="bg-background p-5">
                   <div className="font-display text-3xl font-bold text-orange mb-1">
@@ -90,7 +81,7 @@ export default function AeoGuidePage() {
                 </div>
               ))}
             </div>
-            <div className="space-y-5 bg-background border border-white/10 rounded-lg p-6">
+            <Panel className="space-y-5">
               {LOOP.map((item) => (
                 <div key={item.step} className="flex gap-4">
                   <span className="font-mono text-xs text-orange tracking-widest pt-1">
@@ -102,12 +93,12 @@ export default function AeoGuidePage() {
                   </div>
                 </div>
               ))}
-            </div>
+            </Panel>
           </div>
 
           {/* Right: live demo, then the guide form */}
           <div className="lg:sticky lg:top-24">
-            <div className="relative rounded-lg border border-orange/30 bg-background/95 backdrop-blur-md p-6 md:p-8 mb-6">
+            <Card accent className="relative mb-6">
               <span aria-hidden="true" className="beam-ring" />
               <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
                 Live demo
@@ -121,8 +112,8 @@ export default function AeoGuidePage() {
                 goes by email.
               </p>
               <AeoDemo />
-            </div>
-            <div className="rounded-lg border border-white/10 bg-background/95 backdrop-blur-md p-6 md:p-8">
+            </Card>
+            <Card>
               <p className="font-mono text-xs text-orange tracking-widest uppercase mb-2">
                 Free guide
               </p>
@@ -134,7 +125,7 @@ export default function AeoGuidePage() {
                 weekly and monthly checklist. Tell me where to send it.
               </p>
               <GuideSignupForm />
-            </div>
+            </Card>
             <p className="text-xs text-muted-foreground leading-relaxed mt-4 px-1">
               Want the loop run for you? Signup gets you the guide first. Reply to it and we
               talk about your practice.

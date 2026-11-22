@@ -3,15 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import BlogShell from "@/components/custom/BlogShell";
-
-const inputCls =
-  "w-full px-3 py-2.5 rounded-md bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-orange/60 focus:border-orange/60";
-const labelCls =
-  "block font-mono text-[11px] tracking-widest uppercase text-muted-foreground mb-1.5";
-const buttonCls =
-  "flex-1 py-3 rounded-md bg-orange text-white font-mono text-sm tracking-widest uppercase hover:bg-orange/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
-const saveBtnCls =
-  "py-3 px-5 rounded-md border border-white/10 font-mono text-sm tracking-widest uppercase hover:border-orange/60 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+import { WavesBackdrop, Panel, Card, Notice } from "@/components/custom/surfaces";
+import {
+  inputCls,
+  labelCls,
+  flexBtnCls as buttonCls,
+  ghostBtnCls as saveBtnCls,
+} from "@/components/custom/fields";
 
 type Answers = { q1: string; q2: string; q3: string; q4: string; q5: string };
 const EMPTY: Answers = { q1: "", q2: "", q3: "", q4: "", q5: "" };
@@ -116,21 +114,11 @@ export default function IntakePage() {
 
   return (
     <BlogShell>
-      {/* Fixed background: waves across the whole page, darkened; only the content scrolls */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/aeo-circles.jpg"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/50 to-background/30" />
-        <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.25)]" />
-      </div>
+      <WavesBackdrop image="/images/aeo-circles.jpg" />
       <div className="relative z-10 mx-auto max-w-6xl px-6 py-14">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
-          {/* Left: explanation over the fixed waves background, /aeo style */}
-          <div>
+          {/* Left: explanation in the shared solid Panel over the waves backdrop */}
+          <Panel>
             <p className="mb-4 font-mono text-xs uppercase tracking-widest text-orange">
               Advisory hour · Session setup
             </p>
@@ -159,7 +147,7 @@ export default function IntakePage() {
                   </li>
                 ))}
               </ul>
-              <p className="border-t border-white/10 pt-5 text-sm leading-relaxed text-muted-foreground">
+              <p className="border-t border-foreground/10 pt-5 text-sm leading-relaxed text-muted-foreground">
                 One term worth repeating: the $99 fee counts toward your first
                 project when we start within 30 days.
               </p>
@@ -173,11 +161,11 @@ export default function IntakePage() {
                 </Link>{" "}
                 takes five minutes.
               </p>
-          </div>
+          </Panel>
 
-          {/* Right: the form in a translucent card over the fixed background */}
+          {/* Right: the form in the shared translucent Card over the backdrop */}
           <div className="lg:sticky lg:top-24">
-            <div className="rounded-lg border border-white/10 bg-background/85 p-6 backdrop-blur-md md:p-8">
+            <Card>
             {phase === "loading" && (
               <div>
                 <p className="mb-2 font-mono text-xs uppercase tracking-widest text-orange">
@@ -212,7 +200,7 @@ export default function IntakePage() {
             )}
 
             {(phase === "form" || phase === "done") && showDone && (
-              <div className="rounded-lg border border-orange/30 bg-orange/5 p-5">
+              <Notice>
                 <p className="mb-2 font-mono text-xs uppercase tracking-widest text-orange">
                   Answers in
                 </p>
@@ -232,7 +220,7 @@ export default function IntakePage() {
                 >
                   Update my answers
                 </button>
-              </div>
+              </Notice>
             )}
 
             {(phase === "form" || phase === "done") && !showDone && (
@@ -355,7 +343,7 @@ export default function IntakePage() {
                 </form>
               </div>
             )}
-            </div>
+            </Card>
           </div>
         </div>
       </div>
