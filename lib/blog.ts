@@ -166,7 +166,7 @@ export async function getAllPosts(): Promise<Post[]> {
   for (const p of loadFilePosts()) bySlug.set(p.slug, p);
   for (const p of await loadSheetPosts()) bySlug.set(p.slug, p);
   const showDrafts = process.env.NODE_ENV !== "production";
-  return [...bySlug.values()]
+  return Array.from(bySlug.values())
     .filter((p) => showDrafts || p.status === "published")
     .sort((a, b) =>
       (b.publishedAt || "9999").localeCompare(a.publishedAt || "9999"),
