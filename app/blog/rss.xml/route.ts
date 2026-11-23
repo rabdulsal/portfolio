@@ -1,12 +1,12 @@
 import { SITE_URL, getAllPosts, postUrl } from '@/lib/blog';
 
-export const dynamic = 'force-static';
+export const revalidate = 300;
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export function GET() {
-  const posts = getAllPosts().filter((p) => p.status === 'published');
+export async function GET() {
+  const posts = (await getAllPosts()).filter((p) => p.status === 'published');
   const items = posts
     .map(
       (p) => `<item>

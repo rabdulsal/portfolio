@@ -4,12 +4,13 @@ import React from 'react';
  * Minimal, dependency-free Markdown renderer for blog posts.
  * - Emits React elements only (no dangerouslySetInnerHTML), so raw HTML in a post is rendered as text.
  * - Links are limited to http(s), mailto, site-relative and #anchors.
- * - Images are limited to site-relative paths and res.cloudinary.com, matching the CSP in netlify.toml.
+ * - Images are limited to site-relative paths, res.cloudinary.com and lh3.googleusercontent.com
+ *   (Drive-hosted images for sheet-driven posts), matching the CSP in netlify.toml.
  *   Anything else throws at build time instead of silently breaking in production.
  * - A single newline inside a paragraph renders as a line break.
  */
 
-const IMG_OK = /^(\/(?!\/)|https:\/\/res\.cloudinary\.com\/)/;
+const IMG_OK = /^(\/(?!\/)|https:\/\/res\.cloudinary\.com\/|https:\/\/lh3\.googleusercontent\.com\/)/;
 const HREF_OK = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i;
 
 const INLINE =
@@ -43,7 +44,7 @@ function renderInline(text: string, kp: string): React.ReactNode[] {
     } else if (m[4] !== undefined) {
       if (!IMG_OK.test(m[4])) {
         throw new Error(
-          `Blog image not allowed by CSP (use /path or res.cloudinary.com): ${m[4]}`
+          `Blog image not allowed by CSP (use /path, res.cloudinary.com or lh3.googleusercontent.com): ${m[4]}`
         );
       }
       out.push(

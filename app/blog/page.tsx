@@ -4,8 +4,12 @@ import BlogShell from '@/components/custom/BlogShell';
 import BlogHero from '@/components/custom/BlogHero';
 import { SITE_URL, formatDate, getAllPosts, type Post } from '@/lib/blog';
 
-export function generateMetadata(): Metadata {
-  const hasPosts = getAllPosts().length > 0;
+// Sheet-driven posts: re-check the sheet every 5 minutes so a status flip
+// in the sheet goes live without a deploy.
+export const revalidate = 300;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const hasPosts = (await getAllPosts()).length > 0;
   return {
     title: 'Blog | Rashad Salaam',
     description:
@@ -21,7 +25,7 @@ export function generateMetadata(): Metadata {
 
 // Only images the CSP allows (site-relative or Cloudinary); placeholders are ignored.
 const thumbOf = (img?: string) =>
-  img && /^(\/(?!\/)|https:\/\/res\.cloudinary\.com\/)/.test(img) ? img : undefined;
+  img && /^(\/(?!\/)|https:\/\/res\.cloudinary\.com\/|https:\/\/lh3\.googleusercontent\.com\/)/.test(img) ? img : undefined;
 
 function PostRow({ p }: { p: Post }) {
   return (
@@ -54,8 +58,8 @@ function PostRow({ p }: { p: Post }) {
   );
 }
 
-export default function BlogIndex() {
-  const posts = getAllPosts();
+export default async function BlogIndex() {
+  const posts = await getAllPosts();
   // Drafts are dev-only (see lib/blog.ts). Keep them out of the published
   // list so a staged post can never masquerade as published.
   const published = posts.filter((p) => p.status === 'published');

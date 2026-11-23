@@ -59,7 +59,7 @@ function assertPublishable(p: Post, file: string) {
     throw new Error(`${file} cannot be published: ${problems.join("; ")}`);
 }
 
-function loadAll(): Post[] {
+function loadFilePosts(): Post[] {
   if (!fs.existsSync(BLOG_DIR)) return [];
   return fs
     .readdirSync(BLOG_DIR)
@@ -94,20 +94,87 @@ function loadAll(): Post[] {
 }
 
 /**
- * Production builds only ever see posts with status: published.
- * `next dev` also shows drafts so you can preview them locally.
+ * Sheet-driven posts (added 2026-11-23): the Content Master Sheet Blog tab is
+ * a live source for Portfolio posts, read server-side with the same API key
+ * the Boss Man API uses (GOOGLE_SHEET_API_KEY + GOOGLE_SHEET_ID, set in
+ * Netlify and in .env.local). Column layout is the post-site map:
+ * A status, B post, C persona, D title, E slug, F excerpt, G site, H body,
+ * I seo_keywords, J image_url, K extra images, L notes, M published_url,
+ * N week_of. Only rows with site "Portfolio" are taken. Any failure (missing
+ * env, network, bad payload) returns [] so the file posts always still work.
+ * Production fetches are cached by Next for SHEET_REVALIDATE seconds, so
+ * flipping a row to "published" goes live without a deploy; dev fetches are
+ * uncached, so drafts appear locally as soon as they are staged.
  */
-export function getAllPosts(): Post[] {
+const SHEET_REVALIDATE = 300;
+
+async function loadSheetPosts(): Promise<Post[]> {
+  const key = process.env.GOOGLE_SHEET_API_KEY;
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+  if (!key || !sheetId) return [];
+  try {
+    const range = encodeURIComponent("Blog!A2:N300");
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${key}`;
+    const init: RequestInit & { next?: { revalidate: number } } =
+      process.env.NODE_ENV === "production"
+        ? { next: { revalidate: SHEET_REVALIDATE } }
+        : { cache: "no-store" };
+    const res = await fetch(url, init);
+    if (!res.ok) return [];
+    const json = (await res.json()) as { values?: string[][] };
+    const rows = json.values || [];
+    const posts: Post[] = [];
+    for (const row of rows) {
+      const cell = (i: number) => (row[i] || "").trim();
+      if (cell(6).toLowerCase() !== "portfolio") continue;
+      const slug = cell(4);
+      if (!/^[a-z0-9-]+$/.test(slug)) continue;
+      const statusRaw = cell(0).toLowerCase();
+      if (statusRaw !== "draft" && statusRaw !== "published") continue;
+      const body = cell(7).replace(/^#\s+.*\n+/, "").trim();
+      if (!cell(3) || !body) continue;
+      const week = cell(13);
+      const image = cell(9) || undefined;
+      posts.push({
+        slug,
+        title: cell(3),
+        excerpt: cell(5),
+        seoKeywords: cell(8),
+        author: "Rashad Salaam",
+        publishedAt: /^\d{4}-\d{2}-\d{2}$/.test(week) ? week : "",
+        readMinutes: Math.max(1, Math.ceil(body.split(/\s+/).length / 200)),
+        status: statusRaw,
+        featuredImage: image,
+        socialImage: image,
+        body,
+      });
+    }
+    return posts;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * All posts from both sources. On a slug collision the sheet wins: the sheet
+ * is the day-to-day working surface, the files are the archive.
+ * Production only ever sees posts with status published; `next dev` also
+ * shows drafts so you can preview them locally.
+ */
+export async function getAllPosts(): Promise<Post[]> {
+  const bySlug = new Map<string, Post>();
+  for (const p of loadFilePosts()) bySlug.set(p.slug, p);
+  for (const p of await loadSheetPosts()) bySlug.set(p.slug, p);
   const showDrafts = process.env.NODE_ENV !== "production";
-  return loadAll()
+  return [...bySlug.values()]
     .filter((p) => showDrafts || p.status === "published")
     .sort((a, b) =>
       (b.publishedAt || "9999").localeCompare(a.publishedAt || "9999"),
     );
 }
 
-export function getPost(slug: string): Post | undefined {
-  return getAllPosts().find((p) => p.slug === slug);
+export async function getPost(slug: string): Promise<Post | undefined> {
+  return (await getAllPosts()).find((p) => p.slug === slug);
 }
 
 export const postUrl = (slug: string) => `${SITE_URL}/blog/${slug}/`;

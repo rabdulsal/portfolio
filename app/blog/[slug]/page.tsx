@@ -7,17 +7,19 @@ import {
   SITE_URL, absoluteImage, formatDate, getAllPosts, getPost, postUrl,
 } from '@/lib/blog';
 
-// Production: only slugs that exist at build time are served; everything else is a 404.
-// Dev: slugs render on demand, so a newly staged draft previews without restarting the server.
-// Drafts still 404 in production — getPost() only sees published posts there.
-export const dynamicParams = process.env.NODE_ENV !== 'production';
+// Slugs render on demand in every environment and the result is cached for
+// 5 minutes (ISR), so a sheet-driven post goes live shortly after its sheet
+// status flips to published, with no deploy. Drafts still 404 in production —
+// getPost() only sees published posts there.
+export const dynamicParams = true;
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return getAllPosts().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getAllPosts()).map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const post = getPost(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getPost(params.slug);
   if (!post) return {};
   const image = absoluteImage(post.socialImage) || absoluteImage(post.featuredImage);
   return {
@@ -66,8 +68,8 @@ const FOOTER_CTAS = [
   },
 ];
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export default async function BlogPost({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
   if (!post) notFound();
 
   const cta =
